@@ -17,8 +17,6 @@ S-Lab, Nanyang Technological University
 ### Updates
 
 <!-- Colab demo for Face Restoration is available now. -->
-
-
 - **2022.07.16**:  Test code for face restoration is released. :blush:
 - **2022.06.21**:  This repo is created.
 
