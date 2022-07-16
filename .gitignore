@@ -10,6 +10,7 @@ version.py
 # *.jpg
 *.gif
 *.pth
+*.dat
 *.zip
 
 # template
@@ -118,3 +119,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# project
+results/
