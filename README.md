@@ -4,9 +4,9 @@
 
 ## Towards Robust Blind Face Restoration with Codebook Lookup Transformer
 
-[Paper](https://arxiv.org/abs/xxx) | [Project Page](https://shangchenzhou.com/projects/CodeFormer/) | [Video](https://youtu.be/d3VDpkXlueI)
+[Paper](https://arxiv.org/abs/2206.11253) | [Project Page](https://shangchenzhou.com/projects/CodeFormer/) | [Video](https://youtu.be/d3VDpkXlueI)
 
-<!-- <a href="https://colab.research.google.com/drive/1m52PNveE4PBhYrecj34cnpEeiHcC5LTb?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="google colab logo"></a> -->
+<a href="https://colab.research.google.com/drive/1m52PNveE4PBhYrecj34cnpEeiHcC5LTb?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="google colab logo"></a>
 
 [Shangchen Zhou](https://shangchenzhou.com/), [Kelvin C.K. Chan](https://ckkelvinchan.github.io/), [Chongyi Li](https://li-chongyi.github.io/), [Chen Change Loy](https://www.mmlab-ntu.com/person/ccloy/) 
 
@@ -16,7 +16,7 @@ S-Lab, Nanyang Technological University
 
 ### Updates
 
-<!-- Colab demo for Face Restoration is available now. -->
+- **2022.07.17**: The Colab demo of CodeFormer is available now. <a href="https://colab.research.google.com/drive/1m52PNveE4PBhYrecj34cnpEeiHcC5LTb?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="google colab logo"></a>
 - **2022.07.16**:  Test code for face restoration is released. :blush:
 - **2022.06.21**:  This repo is created.
 
@@ -87,7 +87,7 @@ python inference_codeformer.py --w 0.7 --test_path [input folder]
 
 NOTE that *w* is in [0, 1]. Generally, smaller *w* tends to produce a higher-quality result, while larger *w* yields a higher-fidelity result.
 
-The results are in the `results` folder.
+The results will be saved in the `results` folder.
 
 ### Citation
 If our work is useful for your research, please consider citing:
