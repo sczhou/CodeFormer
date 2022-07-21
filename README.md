@@ -83,7 +83,7 @@ python inference_codeformer.py --w 0.5 --has_aligned --test_path [input folder]
 
 # For the whole images
 # Please set `--upsample_num_times 2` when faces are small and failed detected
-python inference_codeformer.py --w 0.7 -upsample_num_times 1 --test_path [input folder]
+python inference_codeformer.py --w 0.7 --upsample_num_times 1 --test_path [input folder]
 ```
 
 NOTE that *w* is in [0, 1]. Generally, smaller *w* tends to produce a higher-quality result, while larger *w* yields a higher-fidelity result. 
