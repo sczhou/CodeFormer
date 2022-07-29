@@ -228,7 +228,7 @@ class AttnBlock(nn.Module):
 
 
 class Encoder(nn.Module):
-    def __init__(self, in_channels, nf, out_channels, ch_mult, num_res_blocks, resolution, attn_resolutions):
+    def __init__(self, in_channels, nf, emb_dim, ch_mult, num_res_blocks, resolution, attn_resolutions):
         super().__init__()
         self.nf = nf
         self.num_resolutions = len(ch_mult)
@@ -264,7 +264,7 @@ class Encoder(nn.Module):
 
         # normalise and convert to latent size
         blocks.append(normalize(block_in_ch))
-        blocks.append(nn.Conv2d(block_in_ch, out_channels, kernel_size=3, stride=1, padding=1))
+        blocks.append(nn.Conv2d(block_in_ch, emb_dim, kernel_size=3, stride=1, padding=1))
         self.blocks = nn.ModuleList(blocks)
 
     def forward(self, x):
@@ -275,7 +275,7 @@ class Encoder(nn.Module):
 
 
 class Generator(nn.Module):
-    def __init__(self, nf, ch_mult, res_blocks, img_size, attn_resolutions, emb_dim):
+    def __init__(self, nf, emb_dim, ch_mult, res_blocks, img_size, attn_resolutions):
         super().__init__()
         self.nf = nf 
         self.ch_mult = ch_mult 
@@ -362,7 +362,14 @@ class VQAutoEncoder(nn.Module):
                 self.straight_through,
                 self.kl_weight
             )
-        self.generator = Generator(nf, ch_mult, res_blocks, img_size, attn_resolutions, emb_dim)
+        self.generator = Generator(
+            self.nf, 
+            self.embed_dim,
+            self.ch_mult, 
+            self.n_blocks, 
+            self.resolution, 
+            self.attn_resolutions
+        )
 
         if model_path is not None:
             chkpt = torch.load(model_path, map_location='cpu')

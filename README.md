@@ -16,9 +16,10 @@ S-Lab, Nanyang Technological University
 
 ### Updates
 
+- **2022.07.29**: The face detector is upgraded with the family of `['YOLOv5', 'RetinaFace']`. :hugs: 
 - **2022.07.17**: The Colab demo of CodeFormer is available now. <a href="https://colab.research.google.com/drive/1m52PNveE4PBhYrecj34cnpEeiHcC5LTb?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="google colab logo"></a>
-- **2022.07.16**:  Test code for face restoration is released. :blush:
-- **2022.06.21**:  This repo is created.
+- **2022.07.16**: Test code for face restoration is released. :blush:
+- **2022.06.21**: This repo is created.
 
 
 
@@ -54,16 +55,16 @@ source activate codeformer
 # install python dependencies
 pip3 install -r requirements.txt
 python basicsr/setup.py develop
-conda install -c conda-forge dlib
 ```
+<!-- conda install -c conda-forge dlib -->
 
 ### Quick Inference
 
 ##### Download Pre-trained Models:
-Download the dlib pretrained models from [[Google Drive](https://drive.google.com/drive/folders/1YCqeuNDGCsJBAm90eGh7M_WWKTt19yIY?usp=sharing) | [OneDrive](https://entuedu-my.sharepoint.com/:f:/g/personal/s200094_e_ntu_edu_sg/Em2BaKU2OjhDolr11ngbrUgBu8q6SPn8E0jW-AC7nJF0Ig?e=HkjYrF)] to the `weights/dlib` folder. 
+Download the facelib pretrained models from [[Google Drive](https://drive.google.com/drive/folders/1b_3qwrzY_kTQh0-SnBoGBgOrJ_PLZSKm?usp=sharing) | [OneDrive](https://entuedu-my.sharepoint.com/:f:/g/personal/s200094_e_ntu_edu_sg/EvDxR7FcAbZMp_MA9ouq7aQB8XTppMb3-T0uGZ_2anI2mg?e=DXsJFo)] to the `weights/facelib` folder. 
 You can download by run the following command OR manually download the pretrained models.
 ```
-python scripts/download_pretrained_models.py dlib
+python scripts/download_pretrained_models.py facelib
 ```
 
 Download the CodeFormer pretrained models from [[Google Drive](https://drive.google.com/drive/folders/1CNNByjHDFt0b95q54yMVp6Ifo5iuU6QS?usp=sharing) | [OneDrive](https://entuedu-my.sharepoint.com/:f:/g/personal/s200094_e_ntu_edu_sg/EoKFj4wo8cdIn2-TY2IV6CYBhZ0pIG4kUOeHdPR_A5nlbg?e=AO8UN9)] to the `weights/CodeFormer` folder. 
@@ -82,8 +83,7 @@ You can put the testing images in the `inputs/TestWhole` folder. If you would li
 python inference_codeformer.py --w 0.5 --has_aligned --test_path [input folder]
 
 # For the whole images
-# Please set `--upsample_num_times 2` when faces are small and failed detected
-python inference_codeformer.py --w 0.7 --upsample_num_times 1 --test_path [input folder]
+python inference_codeformer.py --w 0.7 --test_path [input folder]
 ```
 
 NOTE that *w* is in [0, 1]. Generally, smaller *w* tends to produce a higher-quality result, while larger *w* yields a higher-fidelity result. 

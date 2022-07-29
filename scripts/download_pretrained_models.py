@@ -1,5 +1,3 @@
-
-
 import argparse
 import os
 from os import path as osp
@@ -36,18 +34,22 @@ if __name__ == '__main__':
     parser.add_argument(
         'method',
         type=str,
-        help=("Options: 'CodeFormer' 'dlib'. Set to 'all' to download all the models."))
+        help=("Options: 'CodeFormer' 'facelib'. Set to 'all' to download all the models."))
     args = parser.parse_args()
 
     # file name: file id
+    # 'dlib': {
+    #     'mmod_human_face_detector-4cb19393.dat': '1qD-OqY8M6j4PWUP_FtqfwUPFPRMu6ubX',
+    #     'shape_predictor_5_face_landmarks-c4b1e980.dat': '1vF3WBUApw4662v9Pw6wke3uk1qxnmLdg',
+    #     'shape_predictor_68_face_landmarks-fbdc2cb8.dat': '1tJyIVdCHaU6IDMDx86BZCxLGZfsWB8yq'
+    # }
     file_ids = {
         'CodeFormer': {
             'codeformer.pth': '1v_E_vZvP-dQPF55Kc5SRCjaKTQXDz-JB'
         },
-        'dlib': {
-            'mmod_human_face_detector-4cb19393.dat': '1qD-OqY8M6j4PWUP_FtqfwUPFPRMu6ubX',
-            'shape_predictor_5_face_landmarks-c4b1e980.dat': '1vF3WBUApw4662v9Pw6wke3uk1qxnmLdg',
-            'shape_predictor_68_face_landmarks-fbdc2cb8.dat': '1tJyIVdCHaU6IDMDx86BZCxLGZfsWB8yq'
+        'facelib': {
+            'yolov5l-face.pth': '131578zMA6B2x8VQHyHfa6GEPtulMCNzV',
+            'parsing_parsenet.pth': '16pkohyZZ8ViHGBk3QtVqxLZKzdo466bK'
         }
     }
 

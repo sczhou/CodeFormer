@@ -8,6 +8,7 @@ version.py
 # *.png
 # *.jpeg
 # *.jpg
+*.pt
 *.gif
 *.pth
 *.dat
@@ -122,3 +123,4 @@ venv.bak/
 
 # project
 results/
+*_old*
