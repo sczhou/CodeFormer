@@ -106,4 +106,7 @@ If our work is useful for your research, please consider citing:
 
 ### Acknowledgement
 
-This project is based on [BasicSR](https://github.com/XPixelGroup/BasicSR).
+This project is based on [BasicSR](https://github.com/XPixelGroup/BasicSR). We also borrow some codes from [Unleashing Transformers](https://github.com/samb-t/unleashing-transformers) and [FaceXLib](https://github.com/xinntao/facexlib).
+
+### Contact
+If you have any question, please feel free to reach me out at `shangchenzhou@gmail.com`.
