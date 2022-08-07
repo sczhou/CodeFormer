@@ -64,6 +64,7 @@ if __name__ == '__main__':
     net.load_state_dict(checkpoint)
     net.eval()
 
+    # ------------------ set up FaceRestoreHelper -------------------
     # large det_model: 'YOLOv5l', 'retinaface_resnet50'
     # small det_model: 'YOLOv5n', 'retinaface_mobile0.25'
     face_helper = FaceRestoreHelper(
@@ -75,9 +76,7 @@ if __name__ == '__main__':
         use_parse=True,
         device=device)
 
-
-    # face_helper.init_dlib(args.detection_path, args.landmark5_path, args.landmark68_path)
-
+    # -------------------- start to processing ---------------------
     # scan all the jpg and png images
     for img_path in sorted(glob.glob(os.path.join(args.test_path, '*.[jp][pn]g'))):
         # clean all the intermediate results to process the next image
