@@ -14,9 +14,8 @@ S-Lab, Nanyang Technological University
 
 <img src="assets/network.jpg" width="800px"/>
 
-&emsp;
-[![GitHub Stars](https://img.shields.io/github/stars/sczhou/CodeFormer?style=social)](https://github.com/sczhou/CodeFormer) 
-Please help to star this repo if CodeFormer is helpful to your pothos or projects. Thanks! :hugs: 
+
+:star: If CodeFormer is helpful to your pothos or projects, please help star this repo. Thanks! :hugs: 
 
 ### Updates
 
