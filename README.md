@@ -14,13 +14,17 @@ S-Lab, Nanyang Technological University
 
 <img src="assets/network.jpg" width="800px"/>
 
+&emsp;
+[![GitHub Stars](https://img.shields.io/github/stars/sczhou/CodeFormer?style=social)](https://github.com/sczhou/CodeFormer) 
+Please help to star this repo if CodeFormer is helpful to your pothos or projects. Thanks! :hugs: 
+
 ### Updates
 
-- **2022.07.29**: New face detector with supporting `['YOLOv5', 'RetinaFace']`. :hugs: 
+- **2022.08.07**: Integrate Real-ESRGAN to support background image enhancement.
+- **2022.07.29**: New face detector with supporting `['YOLOv5', 'RetinaFace']`. 
 - **2022.07.17**: The Colab demo of CodeFormer is available now. <a href="https://colab.research.google.com/drive/1m52PNveE4PBhYrecj34cnpEeiHcC5LTb?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="google colab logo"></a>
 - **2022.07.16**: Test code for face restoration is released. :blush:
 - **2022.06.21**: This repo is created.
-
 
 
 #### Face Restoration
@@ -83,6 +87,8 @@ You can put the testing images in the `inputs/TestWhole` folder. If you would li
 python inference_codeformer.py --w 0.5 --has_aligned --test_path [input folder]
 
 # For the whole images
+# If you want to enhance the background regions with Real-ESRGAN,
+# you can add '--bg_upsampler realesrgan' in the following command
 python inference_codeformer.py --w 0.7 --test_path [input folder]
 ```
 

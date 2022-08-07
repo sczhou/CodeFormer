@@ -1,3 +1,4 @@
+# Modified by Shangchen Zhou from: https://github.com/TencentARC/GFPGAN/blob/master/inference_gfpgan.py
 import os
 import cv2
 import argparse
@@ -20,15 +21,41 @@ if __name__ == '__main__':
     parser.add_argument('--has_aligned', action='store_true', help='Input are cropped and aligned faces')
     parser.add_argument('--only_center_face', action='store_true', help='Only restore the center face')
     parser.add_argument('--draw_box', action='store_true')
+    parser.add_argument('--bg_upsampler', type=str, default='realesrgan', help='background upsampler. Default: realesrgan')
+    parser.add_argument('--bg_tile', type=int, default=400, help='Tile size for background sampler. Default: 400')
 
     args = parser.parse_args()
+
+    # ------------------------ input & output ------------------------
     if args.test_path.endswith('/'):  # solve when path ends with /
         args.test_path = args.test_path[:-1]
 
     w = args.w
     result_root = f'results/{os.path.basename(args.test_path)}_{w}'
 
-    # set up the Network
+    # ------------------ set up background upsampler ------------------
+    if args.bg_upsampler == 'realesrgan':
+        if not torch.cuda.is_available():  # CPU
+            import warnings
+            warnings.warn('The unoptimized RealESRGAN is slow on CPU. We do not use it. '
+                          'If you really want to use it, please modify the corresponding codes.')
+            bg_upsampler = None
+        else:
+            from basicsr.archs.rrdbnet_arch import RRDBNet
+            from basicsr.utils.realesrgan_utils import RealESRGANer
+            model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=2)
+            bg_upsampler = RealESRGANer(
+                scale=2,
+                model_path='https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.1/RealESRGAN_x2plus.pth',
+                model=model,
+                tile=args.bg_tile,
+                tile_pad=10,
+                pre_pad=0,
+                half=True)  # need to set False in CPU mode
+    else:
+        bg_upsampler = None
+
+    # ------------------ set up CodeFormer restorer -------------------
     net = ARCH_REGISTRY.get('CodeFormer')(dim_embd=512, codebook_size=1024, n_head=8, n_layers=9, 
                                             connect_list=['32', '64', '128', '256']).to(device)
 
@@ -98,7 +125,12 @@ if __name__ == '__main__':
 
         # paste_back
         if not args.has_aligned:
-            bg_img = None
+            # upsample the background
+            if bg_upsampler is not None:
+                # Now only support RealESRGAN for upsampling background
+                bg_img = bg_upsampler.enhance(img, outscale=args.upscale)[0]
+            else:
+                bg_img = None
             face_helper.get_inverse_affine(None)
             # paste each restored face to the input image
             restored_img = face_helper.paste_faces_to_input_image(upsample_img=bg_img, draw_box=args.draw_box)
