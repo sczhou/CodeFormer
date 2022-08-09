@@ -38,7 +38,8 @@ if __name__ == '__main__':
         if not torch.cuda.is_available():  # CPU
             import warnings
             warnings.warn('The unoptimized RealESRGAN is slow on CPU. We do not use it. '
-                          'If you really want to use it, please modify the corresponding codes.')
+                          'If you really want to use it, please modify the corresponding codes.',
+                          category=RuntimeWarning)
             bg_upsampler = None
         else:
             from basicsr.archs.rrdbnet_arch import RRDBNet
