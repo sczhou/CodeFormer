@@ -6,10 +6,15 @@ import glob
 import torch
 from torchvision.transforms.functional import normalize
 from basicsr.utils import imwrite, img2tensor, tensor2img
+from basicsr.utils.download_util import load_file_from_url
 from facelib.utils.face_restoration_helper import FaceRestoreHelper
 import torch.nn.functional as F
 
 from basicsr.utils.registry import ARCH_REGISTRY
+
+pretrain_model_url = {
+    'restoration': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/codeformer.pth',
+}
 
 if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -59,8 +64,10 @@ if __name__ == '__main__':
     # ------------------ set up CodeFormer restorer -------------------
     net = ARCH_REGISTRY.get('CodeFormer')(dim_embd=512, codebook_size=1024, n_head=8, n_layers=9, 
                                             connect_list=['32', '64', '128', '256']).to(device)
-
-    ckpt_path = 'weights/CodeFormer/codeformer.pth'
+    
+    # ckpt_path = 'weights/CodeFormer/codeformer.pth'
+    ckpt_path = load_file_from_url(url=pretrain_model_url['restoration'], 
+                                    model_dir='weights/CodeFormer', progress=True, file_name=None)
     checkpoint = torch.load(ckpt_path)['params_ema']
     net.load_state_dict(checkpoint)
     net.eval()
