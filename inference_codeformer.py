@@ -26,7 +26,7 @@ if __name__ == '__main__':
     parser.add_argument('--has_aligned', action='store_true', help='Input are cropped and aligned faces')
     parser.add_argument('--only_center_face', action='store_true', help='Only restore the center face')
     parser.add_argument('--draw_box', action='store_true')
-    parser.add_argument('--bg_upsampler', type=str, default='realesrgan', help='background upsampler. Default: realesrgan')
+    parser.add_argument('--bg_upsampler', type=str, default='None', help='background upsampler. Optional: realesrgan')
     parser.add_argument('--bg_tile', type=int, default=400, help='Tile size for background sampler. Default: 400')
 
     args = parser.parse_args()
