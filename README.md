@@ -16,7 +16,7 @@ S-Lab, Nanyang Technological University
 <img src="assets/network.jpg" width="800px"/>
 
 
-:star: If CodeFormer is helpful to your pothos or projects, please help star this repo. Thanks! :hugs: 
+:star: If CodeFormer is helpful to your projects, please help star this repo. Thanks! :hugs: 
 
 ### Updates
 

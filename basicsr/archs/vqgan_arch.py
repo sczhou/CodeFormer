@@ -388,3 +388,48 @@ class VQAutoEncoder(nn.Module):
         quant, codebook_loss, quant_stats = self.quantize(x)
         x = self.generator(quant)
         return x, codebook_loss, quant_stats
+
+
+
+# patch based discriminator
+@ARCH_REGISTRY.register()
+class VQGANDiscriminator(nn.Module):
+    def __init__(self, nc=3, ndf=64, n_layers=4, model_path=None):
+        super().__init__()
+
+        layers = [nn.Conv2d(nc, ndf, kernel_size=4, stride=2, padding=1), nn.LeakyReLU(0.2, True)]
+        ndf_mult = 1
+        ndf_mult_prev = 1
+        for n in range(1, n_layers):  # gradually increase the number of filters
+            ndf_mult_prev = ndf_mult
+            ndf_mult = min(2 ** n, 8)
+            layers += [
+                nn.Conv2d(ndf * ndf_mult_prev, ndf * ndf_mult, kernel_size=4, stride=2, padding=1, bias=False),
+                nn.BatchNorm2d(ndf * ndf_mult),
+                nn.LeakyReLU(0.2, True)
+            ]
+
+        ndf_mult_prev = ndf_mult
+        ndf_mult = min(2 ** n_layers, 8)
+
+        layers += [
+            nn.Conv2d(ndf * ndf_mult_prev, ndf * ndf_mult, kernel_size=4, stride=1, padding=1, bias=False),
+            nn.BatchNorm2d(ndf * ndf_mult),
+            nn.LeakyReLU(0.2, True)
+        ]
+
+        layers += [
+            nn.Conv2d(ndf * ndf_mult, 1, kernel_size=4, stride=1, padding=1)]  # output 1 channel prediction map
+        self.main = nn.Sequential(*layers)
+
+        if model_path is not None:
+            chkpt = torch.load(model_path, map_location='cpu')
+            if 'params_d' in chkpt:
+                self.load_state_dict(torch.load(model_path, map_location='cpu')['params_d'])
+            elif 'params' in chkpt:
+                self.load_state_dict(torch.load(model_path, map_location='cpu')['params'])
+            else:
+                raise ValueError(f'Wrong params!')
+
+    def forward(self, x):
+        return self.main(x)
