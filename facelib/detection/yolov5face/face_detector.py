@@ -17,6 +17,9 @@ from facelib.detection.yolov5face.utils.general import (
     scale_coords_landmarks,
 )
 
+IS_HIGH_VERSION = tuple(map(int, torch.__version__.split('+')[0].split('.'))) >= (1, 9, 0)
+
+
 def isListempty(inList):
     if isinstance(inList, list): # Is a list
         return all(map(isListempty, inList))
@@ -116,8 +119,14 @@ class YoloDetector:
         origimgs = copy.deepcopy(images)
 
         images = self._preprocess(images)
-        with torch.inference_mode():  # change this with torch.no_grad() for pytorch <1.8 compatibility
-            pred = self.detector(images)[0]
+        
+        if IS_HIGH_VERSION:
+            with torch.inference_mode():  # for pytorch>=1.9 
+                pred = self.detector(images)[0]
+        else:
+            with torch.no_grad():  # for pytorch<1.9
+                pred = self.detector(images)[0]
+
         bboxes, points = self._postprocess(images, origimgs, pred, conf_thres, iou_thres)
 
         # return bboxes, points

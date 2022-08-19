@@ -69,7 +69,7 @@ class FaceRestoreHelper(object):
             self.face_template = np.array([[192, 240], [319, 240], [257, 371]])
         else:
             # standard 5 landmarks for FFHQ faces with 512 x 512 
-            # # xintao
+            # facexlib
             self.face_template = np.array([[192.98138, 239.94708], [318.90277, 240.1936], [256.63416, 314.01935],
                                            [201.26117, 371.41043], [313.08905, 371.15118]])
 

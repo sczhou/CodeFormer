@@ -123,4 +123,6 @@ venv.bak/
 
 # project
 results/
+dlib/
 *_old*
+

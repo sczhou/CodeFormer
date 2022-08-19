@@ -91,8 +91,6 @@ if __name__ == '__main__':
         face_helper.clean_all()
 
         img_name = os.path.basename(img_path)
-        # if not '04' in img_name:
-        #     continue 
         print(f'Processing: {img_name}')
         basename, ext = os.path.splitext(img_name)
         img = cv2.imread(img_path, cv2.IMREAD_COLOR)
