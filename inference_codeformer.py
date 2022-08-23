@@ -25,6 +25,9 @@ if __name__ == '__main__':
     parser.add_argument('--test_path', type=str, default='./inputs/cropped_faces')
     parser.add_argument('--has_aligned', action='store_true', help='Input are cropped and aligned faces')
     parser.add_argument('--only_center_face', action='store_true', help='Only restore the center face')
+    # large det_model: 'YOLOv5l', 'retinaface_resnet50'
+    # small det_model: 'YOLOv5n', 'retinaface_mobile0.25'
+    parser.add_argument('--detection_model', type=str, default='retinaface_resnet50')
     parser.add_argument('--draw_box', action='store_true')
     parser.add_argument('--bg_upsampler', type=str, default='None', help='background upsampler. Optional: realesrgan')
     parser.add_argument('--bg_tile', type=int, default=400, help='Tile size for background sampler. Default: 400')
@@ -55,7 +58,7 @@ if __name__ == '__main__':
                 model_path='https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.1/RealESRGAN_x2plus.pth',
                 model=model,
                 tile=args.bg_tile,
-                tile_pad=10,
+                tile_pad=40,
                 pre_pad=0,
                 half=True)  # need to set False in CPU mode
     else:
@@ -75,11 +78,13 @@ if __name__ == '__main__':
     # ------------------ set up FaceRestoreHelper -------------------
     # large det_model: 'YOLOv5l', 'retinaface_resnet50'
     # small det_model: 'YOLOv5n', 'retinaface_mobile0.25'
+    if not args.has_aligned: 
+        print(f'Using [{args.detection_model}] for face detection network.')
     face_helper = FaceRestoreHelper(
         args.upscale,
         face_size=512,
         crop_ratio=(1, 1),
-        det_model = 'YOLOv5l',
+        det_model = args.detection_model,
         save_ext='png',
         use_parse=True,
         device=device)
@@ -89,7 +94,7 @@ if __name__ == '__main__':
     for img_path in sorted(glob.glob(os.path.join(args.test_path, '*.[jp][pn]g'))):
         # clean all the intermediate results to process the next image
         face_helper.clean_all()
-
+        
         img_name = os.path.basename(img_path)
         print(f'Processing: {img_name}')
         basename, ext = os.path.splitext(img_name)

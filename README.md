@@ -20,6 +20,7 @@ S-Lab, Nanyang Technological University
 
 ### Updates
 
+- **2022.08.23**: Some modifications on face detection and fusion for better AI-created face enhancement.
 - **2022.08.07**: Integrate Real-ESRGAN to support background image enhancement.
 - **2022.07.29**: New face detector with supporting `['YOLOv5', 'RetinaFace']`. 
 - **2022.07.17**: The Colab demo of CodeFormer is available now. <a href="https://colab.research.google.com/drive/1m52PNveE4PBhYrecj34cnpEeiHcC5LTb?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="google colab logo"></a>
@@ -110,7 +111,7 @@ If our work is useful for your research, please consider citing:
 
 ### Acknowledgement
 
-This project is based on [BasicSR](https://github.com/XPixelGroup/BasicSR). We also borrow some codes from [Unleashing Transformers](https://github.com/samb-t/unleashing-transformers), [YOLOv5-face](https://github.com/deepcam-cn/yolov5-face), and [FaceXLib](https://github.com/xinntao/facexlib).
+This project is based on [BasicSR](https://github.com/XPixelGroup/BasicSR). We also borrow some codes from [Unleashing Transformers](https://github.com/samb-t/unleashing-transformers), [YOLOv5-face](https://github.com/deepcam-cn/yolov5-face), and [FaceXLib](https://github.com/xinntao/facexlib). Thanks for their awesome works.
 
 ### Contact
 If you have any question, please feel free to reach me out at `shangchenzhou@gmail.com`.
