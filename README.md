@@ -27,7 +27,7 @@ S-Lab, Nanyang Technological University
 - **2022.07.16**: Test code for face restoration is released. :blush:
 - **2022.06.21**: This repo is created.
 
-## TODO
+### TODO
 - [ ] Add checkpoint for face inpainting
 - [ ] Add training code and config files
 - [x] ~~Add background image enhancement~~
