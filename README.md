@@ -22,11 +22,15 @@ S-Lab, Nanyang Technological University
 
 - **2022.08.23**: Some modifications on face detection and fusion for better AI-created face enhancement.
 - **2022.08.07**: Integrate Real-ESRGAN to support background image enhancement.
-- **2022.07.29**: New face detector with supporting `['YOLOv5', 'RetinaFace']`. 
-- **2022.07.17**: The Colab demo of CodeFormer is available now. <a href="https://colab.research.google.com/drive/1m52PNveE4PBhYrecj34cnpEeiHcC5LTb?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="google colab logo"></a>
+- **2022.07.29**: Integrate new face detectors of `['RetinaFace'(default), 'YOLOv5']`. 
+- **2022.07.17**: Colab demo of CodeFormer is available now. <a href="https://colab.research.google.com/drive/1m52PNveE4PBhYrecj34cnpEeiHcC5LTb?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="google colab logo"></a>
 - **2022.07.16**: Test code for face restoration is released. :blush:
 - **2022.06.21**: This repo is created.
 
+## TODO
+- [ ] Add checkpoint for face inpainting
+- [ ] Add training code and config files
+- [x] ~~Add background image enhancement~~
 
 #### Face Restoration
 
