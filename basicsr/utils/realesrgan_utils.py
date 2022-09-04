@@ -196,16 +196,19 @@ class RealESRGANer():
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         # ------------------- process image (without the alpha channel) ------------------- #
-        self.pre_process(img)
-        if self.tile_size > 0:
-            self.tile_process()
-        else:
-            self.process()
-        output_img = self.post_process()
-        output_img = output_img.data.squeeze().float().cpu().clamp_(0, 1).numpy()
-        output_img = np.transpose(output_img[[2, 1, 0], :, :], (1, 2, 0))
-        if img_mode == 'L':
-            output_img = cv2.cvtColor(output_img, cv2.COLOR_BGR2GRAY)
+        with torch.no_grad():
+            self.pre_process(img)
+            if self.tile_size > 0:
+                self.tile_process()
+            else:
+                self.process()
+            output_img_t = self.post_process()
+            output_img = output_img_t.data.squeeze().float().cpu().clamp_(0, 1).numpy()
+            output_img = np.transpose(output_img[[2, 1, 0], :, :], (1, 2, 0))
+            if img_mode == 'L':
+                output_img = cv2.cvtColor(output_img, cv2.COLOR_BGR2GRAY)
+        del output_img_t
+        torch.cuda.empty_cache()        
 
         # ------------------- process the alpha channel if necessary ------------------- #
         if img_mode == 'RGBA':

@@ -294,10 +294,12 @@ class FaceRestoreHelper(object):
                 save_path = f'{path}_{idx:02d}.pth'
                 torch.save(inverse_affine, save_path)
 
+
     def add_restored_face(self, face):
         self.restored_faces.append(face)
 
-    def paste_faces_to_input_image(self, save_path=None, upsample_img=None, draw_box=False):
+
+    def paste_faces_to_input_image(self, save_path=None, upsample_img=None, draw_box=False, face_upsampler=None):
         h, w, _ = self.input_img.shape
         h_up, w_up = int(h * self.upscale_factor), int(w * self.upscale_factor)
 
@@ -313,16 +315,23 @@ class FaceRestoreHelper(object):
         
         inv_mask_borders = []
         for restored_face, inverse_affine in zip(self.restored_faces, self.inverse_affine_matrices):
-            # Add an offset to inverse affine matrix, for more precise back alignment
-            if self.upscale_factor > 1:
-                extra_offset = 0.5 * self.upscale_factor
+            if face_upsampler is not None:
+                restored_face = face_upsampler.enhance(restored_face, outscale=self.upscale_factor)[0]
+                inverse_affine /= self.upscale_factor
+                inverse_affine[:, 2] *= self.upscale_factor
+                face_size = (self.face_size[0]*self.upscale_factor, self.face_size[1]*self.upscale_factor)
             else:
-                extra_offset = 0
-            inverse_affine[:, 2] += extra_offset
+                # Add an offset to inverse affine matrix, for more precise back alignment
+                if self.upscale_factor > 1:
+                    extra_offset = 0.5 * self.upscale_factor
+                else:
+                    extra_offset = 0
+                inverse_affine[:, 2] += extra_offset
+                face_size = self.face_size
             inv_restored = cv2.warpAffine(restored_face, inverse_affine, (w_up, h_up))
 
             # if draw_box or not self.use_parse:  # use square parse maps
-            #     mask = np.ones(self.face_size, dtype=np.float32)
+            #     mask = np.ones(face_size, dtype=np.float32)
             #     inv_mask = cv2.warpAffine(mask, inverse_affine, (w_up, h_up))
             #     # remove the black borders
             #     inv_mask_erosion = cv2.erode(
@@ -331,7 +340,7 @@ class FaceRestoreHelper(object):
             #     total_face_area = np.sum(inv_mask_erosion)  # // 3
             #     # add border
             #     if draw_box:
-            #         h, w = self.face_size
+            #         h, w = face_size
             #         mask_border = np.ones((h, w, 3), dtype=np.float32)
             #         border = int(1400/np.sqrt(total_face_area))
             #         mask_border[border:h-border, border:w-border,:] = 0
@@ -349,7 +358,7 @@ class FaceRestoreHelper(object):
             #         inv_soft_mask = inv_soft_mask[:, :, None]
 
             # always use square mask
-            mask = np.ones(self.face_size, dtype=np.float32)
+            mask = np.ones(face_size, dtype=np.float32)
             inv_mask = cv2.warpAffine(mask, inverse_affine, (w_up, h_up))
             # remove the black borders
             inv_mask_erosion = cv2.erode(
@@ -358,7 +367,7 @@ class FaceRestoreHelper(object):
             total_face_area = np.sum(inv_mask_erosion)  # // 3
             # add border
             if draw_box:
-                h, w = self.face_size
+                h, w = face_size
                 mask_border = np.ones((h, w, 3), dtype=np.float32)
                 border = int(1400/np.sqrt(total_face_area))
                 mask_border[border:h-border, border:w-border,:] = 0
@@ -400,7 +409,7 @@ class FaceRestoreHelper(object):
                 parse_mask[:, -thres:] = 0
                 parse_mask = parse_mask / 255.
 
-                parse_mask = cv2.resize(parse_mask, restored_face.shape[:2])
+                parse_mask = cv2.resize(parse_mask, face_size)
                 parse_mask = cv2.warpAffine(parse_mask, inverse_affine, (w_up, h_up), flags=3)
                 inv_soft_parse_mask = parse_mask[:, :, None]
                 # pasted_face = inv_restored

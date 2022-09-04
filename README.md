@@ -16,10 +16,11 @@ S-Lab, Nanyang Technological University
 <img src="assets/network.jpg" width="800px"/>
 
 
-:star: If CodeFormer is helpful to your projects, please help star this repo. Thanks! :hugs: 
+:star: If CodeFormer is helpful to your images or projects, please help star this repo. Thanks! :hugs: 
 
 ### Updates
 
+- **2022.09.04**: Add face upsampling '--face_upsample' for high-resolution AI-created face enhancement.
 - **2022.08.23**: Some modifications on face detection and fusion for better AI-created face enhancement.
 - **2022.08.07**: Integrate Real-ESRGAN to support background image enhancement.
 - **2022.07.29**: Integrate new face detectors of `['RetinaFace'(default), 'YOLOv5']`. 
@@ -59,7 +60,7 @@ cd CodeFormer
 
 # create new anaconda env
 conda create -n codeformer python=3.8 -y
-source activate codeformer
+conda activate codeformer
 
 # install python dependencies
 pip3 install -r requirements.txt
@@ -90,8 +91,8 @@ You can put the testing images in the `inputs/TestWhole` folder. If you would li
 python inference_codeformer.py --w 0.5 --has_aligned --test_path [input folder]
 
 # For the whole images
-# If you want to enhance the background regions with Real-ESRGAN,
-# you can add '--bg_upsampler realesrgan' in the following command
+# Add '--bg_upsampler realesrgan' to enhance the background regions with Real-ESRGAN
+# Add '--face_upsample' to further upsample restorated face with Real-ESRGAN
 python inference_codeformer.py --w 0.7 --test_path [input folder]
 ```
 
