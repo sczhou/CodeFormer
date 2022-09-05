@@ -16,6 +16,27 @@ pretrain_model_url = {
     'restoration': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/codeformer.pth',
 }
 
+def set_realesrgan():
+    if not torch.cuda.is_available():  # CPU
+        import warnings
+        warnings.warn('The unoptimized RealESRGAN is slow on CPU. We do not use it. '
+                        'If you really want to use it, please modify the corresponding codes.',
+                        category=RuntimeWarning)
+        bg_upsampler = None
+    else:
+        from basicsr.archs.rrdbnet_arch import RRDBNet
+        from basicsr.utils.realesrgan_utils import RealESRGANer
+        model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=2)
+        bg_upsampler = RealESRGANer(
+            scale=2,
+            model_path='https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.1/RealESRGAN_x2plus.pth',
+            model=model,
+            tile=args.bg_tile,
+            tile_pad=40,
+            pre_pad=0,
+            half=True)  # need to set False in CPU mode
+    return bg_upsampler
+
 if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     parser = argparse.ArgumentParser()
@@ -44,26 +65,18 @@ if __name__ == '__main__':
 
     # ------------------ set up background upsampler ------------------
     if args.bg_upsampler == 'realesrgan':
-        if not torch.cuda.is_available():  # CPU
-            import warnings
-            warnings.warn('The unoptimized RealESRGAN is slow on CPU. We do not use it. '
-                          'If you really want to use it, please modify the corresponding codes.',
-                          category=RuntimeWarning)
-            bg_upsampler = None
-        else:
-            from basicsr.archs.rrdbnet_arch import RRDBNet
-            from basicsr.utils.realesrgan_utils import RealESRGANer
-            model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=2)
-            bg_upsampler = RealESRGANer(
-                scale=2,
-                model_path='https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.1/RealESRGAN_x2plus.pth',
-                model=model,
-                tile=args.bg_tile,
-                tile_pad=40,
-                pre_pad=0,
-                half=True)  # need to set False in CPU mode
+        bg_upsampler = set_realesrgan()
     else:
         bg_upsampler = None
+
+    # ------------------ set up face upsampler ------------------
+    if args.face_upsample:
+        if bg_upsampler is not None:
+            face_upsampler = bg_upsampler
+        else:
+            face_upsampler = set_realesrgan()
+    else:
+        face_upsampler = None
 
     # ------------------ set up CodeFormer restorer -------------------
     net = ARCH_REGISTRY.get('CodeFormer')(dim_embd=512, codebook_size=1024, n_head=8, n_layers=9, 
@@ -80,12 +93,12 @@ if __name__ == '__main__':
     # large det_model: 'YOLOv5l', 'retinaface_resnet50'
     # small det_model: 'YOLOv5n', 'retinaface_mobile0.25'
     if not args.has_aligned: 
-        print(f'Using [{args.detection_model}] for face detection network.')
-    if args.bg_upsampler is not None: 
+        print(f'Face detection model: {args.detection_model}')
+    if bg_upsampler is not None: 
         print(f'Background upsampling: True, Face upsampling: {args.face_upsample}')
     else:
-        print('Background upsampling: False, Face upsampling: False')
-        
+        print(f'Background upsampling: False, Face upsampling: {args.face_upsample}')
+
     face_helper = FaceRestoreHelper(
         args.upscale,
         face_size=512,
@@ -149,8 +162,8 @@ if __name__ == '__main__':
                 bg_img = None
             face_helper.get_inverse_affine(None)
             # paste each restored face to the input image
-            if args.face_upsample and bg_upsampler is not None: 
-                restored_img = face_helper.paste_faces_to_input_image(upsample_img=bg_img, draw_box=args.draw_box, face_upsampler=bg_upsampler)
+            if args.face_upsample and face_upsampler is not None: 
+                restored_img = face_helper.paste_faces_to_input_image(upsample_img=bg_img, draw_box=args.draw_box, face_upsampler=face_upsampler)
             else:
                 restored_img = face_helper.paste_faces_to_input_image(upsample_img=bg_img, draw_box=args.draw_box)
 

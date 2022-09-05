@@ -20,7 +20,7 @@ S-Lab, Nanyang Technological University
 
 ### Updates
 
-- **2022.09.04**: Add face upsampling '--face_upsample' for high-resolution AI-created face enhancement.
+- **2022.09.04**: Add face upsampling `--face_upsample` for high-resolution AI-created face enhancement.
 - **2022.08.23**: Some modifications on face detection and fusion for better AI-created face enhancement.
 - **2022.08.07**: Integrate Real-ESRGAN to support background image enhancement.
 - **2022.07.29**: Integrate new face detectors of `['RetinaFace'(default), 'YOLOv5']`. 
