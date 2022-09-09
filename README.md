@@ -6,8 +6,8 @@
 
 [Paper](https://arxiv.org/abs/2206.11253) | [Project Page](https://shangchenzhou.com/projects/CodeFormer/) | [Video](https://youtu.be/d3VDpkXlueI)
 
-<a href="https://colab.research.google.com/drive/1m52PNveE4PBhYrecj34cnpEeiHcC5LTb?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="google colab logo"></a> ![visitors](https://visitor-badge.glitch.me/badge?page_id=sczhou/CodeFormer)
-[![Replicate](https://replicate.com/cjwbw/codeformer/badge)](https://replicate.com/cjwbw/codeformer)
+
+<a href="https://colab.research.google.com/drive/1m52PNveE4PBhYrecj34cnpEeiHcC5LTb?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="google colab logo"></a> [![Replicate](https://img.shields.io/badge/Demo-%F0%9F%9A%80%20Replicate-blue)](https://replicate.com/sczhou/codeformer) ![visitors](https://visitor-badge.glitch.me/badge?page_id=sczhou/CodeFormer)
 
 [Shangchen Zhou](https://shangchenzhou.com/), [Kelvin C.K. Chan](https://ckkelvinchan.github.io/), [Chongyi Li](https://li-chongyi.github.io/), [Chen Change Loy](https://www.mmlab-ntu.com/person/ccloy/) 
 
@@ -18,14 +18,15 @@ S-Lab, Nanyang Technological University
 
 :star: If CodeFormer is helpful to your images or projects, please help star this repo. Thanks! :hugs: 
 
-### Updates
+### Update
 
+- **2022.09.09**: Integrated to [Replicate](https://replicate.com/). Try out online demo! [![Replicate](https://img.shields.io/badge/Demo-%F0%9F%9A%80%20Replicate-blue)](https://replicate.com/sczhou/codeformer)
 - **2022.09.04**: Add face upsampling `--face_upsample` for high-resolution AI-created face enhancement.
 - **2022.08.23**: Some modifications on face detection and fusion for better AI-created face enhancement.
-- **2022.08.07**: Integrate Real-ESRGAN to support background image enhancement.
+- **2022.08.07**: Integrate [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) to support background image enhancement.
 - **2022.07.29**: Integrate new face detectors of `['RetinaFace'(default), 'YOLOv5']`. 
-- **2022.07.17**: Colab demo of CodeFormer is available now. <a href="https://colab.research.google.com/drive/1m52PNveE4PBhYrecj34cnpEeiHcC5LTb?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="google colab logo"></a>
-- **2022.07.16**: Test code for face restoration is released. :blush:
+- **2022.07.17**: Add Colab demo of CodeFormer. <a href="https://colab.research.google.com/drive/1m52PNveE4PBhYrecj34cnpEeiHcC5LTb?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="google colab logo"></a>
+- **2022.07.16**: Release inference code for face restoration. :blush:
 - **2022.06.21**: This repo is created.
 
 ### TODO
