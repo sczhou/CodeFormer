@@ -1,15 +1,18 @@
 """
-download checkpoints to ./weights beforehand 
-python scripts/download_pretrained_models.py facelib
-python scripts/download_pretrained_models.py CodeFormer
-wget 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.1/RealESRGAN_x2plus.pth'
+This file is used for deploying replicate demo:
+https://replicate.com/sczhou/codeformer
+running: cog predict -i image=@inputs/whole_imgs/04.jpg -i codeformer_fidelity=0.5 -i upscale=2
+push: cog push r8.im/sczhou/codeformer
 """
 
 import tempfile
 import cv2
 import torch
 from torchvision.transforms.functional import normalize
-from cog import BasePredictor, Input, Path
+try:
+    from cog import BasePredictor, Input, Path
+except Exception:
+    print('please install cog package')
 
 from basicsr.utils import imwrite, img2tensor, tensor2img
 from basicsr.archs.rrdbnet_arch import RRDBNet
@@ -22,7 +25,7 @@ class Predictor(BasePredictor):
     def setup(self):
         """Load the model into memory to make running multiple predictions efficient"""
         self.device = "cuda:0"
-        self.bg_upsampler = set_realesrgan()
+        self.upsampler = set_realesrgan()
         self.net = ARCH_REGISTRY.get("CodeFormer")(
             dim_embd=512,
             codebook_size=1024,
@@ -76,8 +79,8 @@ class Predictor(BasePredictor):
             device=self.device,
         )
 
-        bg_upsampler = self.bg_upsampler if background_enhance else None
-        face_upsampler = self.bg_upsampler if face_upsample else None
+        bg_upsampler = self.upsampler if background_enhance else None
+        face_upsampler = self.upsampler if face_upsample else None
 
         img = cv2.imread(str(image), cv2.IMREAD_COLOR)
 
@@ -143,10 +146,8 @@ class Predictor(BasePredictor):
                 )
 
         # save restored img
-        out_path = Path(tempfile.mkdtemp()) / "output.png"
-
-        if not has_aligned and restored_img is not None:
-            imwrite(restored_img, str(out_path))
+        out_path = Path(tempfile.mkdtemp()) / 'output.png'
+        imwrite(restored_img, str(out_path))
 
         return out_path
 
@@ -166,7 +167,7 @@ def set_realesrgan():
             "If you really want to use it, please modify the corresponding codes.",
             category=RuntimeWarning,
         )
-        bg_upsampler = None
+        upsampler = None
     else:
         model = RRDBNet(
             num_in_ch=3,
@@ -176,13 +177,13 @@ def set_realesrgan():
             num_grow_ch=32,
             scale=2,
         )
-        bg_upsampler = RealESRGANer(
+        upsampler = RealESRGANer(
             scale=2,
-            model_path="./weights/RealESRGAN_x2plus.pth",
+            model_path="./weights/realesrgan/RealESRGAN_x2plus.pth",
             model=model,
             tile=400,
             tile_pad=40,
             pre_pad=0,
             half=True,
         )
-    return bg_upsampler
+    return upsampler

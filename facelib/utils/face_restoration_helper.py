@@ -59,7 +59,7 @@ class FaceRestoreHelper(object):
                  use_parse=False,
                  device=None):
         self.template_3points = template_3points  # improve robustness
-        self.upscale_factor = upscale_factor
+        self.upscale_factor = int(upscale_factor)
         # the cropped face ratio based on the square face
         self.crop_ratio = crop_ratio  # (h, w)
         assert (self.crop_ratio[0] >= 1 and self.crop_ratio[1] >= 1), 'crop ration only supports >=1'

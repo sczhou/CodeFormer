@@ -1,3 +1,8 @@
+"""
+This file is used for deploying replicate demo:
+https://replicate.com/sczhou/codeformer
+"""
+
 build:
   gpu: true
   cuda: "11.3"
