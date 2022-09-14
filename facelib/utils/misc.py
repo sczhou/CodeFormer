@@ -1,6 +1,8 @@
 import cv2
 import os
 import os.path as osp
+import numpy as np
+from PIL import Image
 import torch
 from torch.hub import download_url_to_file, get_dir
 from urllib.parse import urlparse
@@ -139,3 +141,34 @@ def scandir(dir_path, suffix=None, recursive=False, full_path=False):
                     continue
 
     return _scandir(dir_path, suffix=suffix, recursive=recursive)
+
+
+def is_gray(img, threshold=10):
+    img = Image.fromarray(img)
+    if len(img.getbands()) == 1:
+        return True
+    img1 = np.asarray(img.getchannel(channel=0), dtype=np.int16)
+    img2 = np.asarray(img.getchannel(channel=1), dtype=np.int16)
+    img3 = np.asarray(img.getchannel(channel=2), dtype=np.int16)
+    diff1 = (img1 - img2).var()
+    diff2 = (img2 - img3).var()
+    diff3 = (img3 - img1).var()
+    diff_sum = (diff1 + diff2 + diff3) / 3.0
+    if diff_sum <= threshold:
+        return True
+    else:
+        return False
+
+def rgb2gray(img, out_channel=3):
+    r, g, b = img[:,:,0], img[:,:,1], img[:,:,2]
+    gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
+    if out_channel == 3:
+        gray = gray[:,:,np.newaxis].repeat(3, axis=2)
+    return gray
+
+def bgr2gray(img, out_channel=3):
+    b, g, r = img[:,:,0], img[:,:,1], img[:,:,2]
+    gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
+    if out_channel == 3:
+        gray = gray[:,:,np.newaxis].repeat(3, axis=2)
+    return gray

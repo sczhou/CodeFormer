@@ -6,7 +6,7 @@ from torchvision.transforms.functional import normalize
 
 from facelib.detection import init_detection_model
 from facelib.parsing import init_parsing_model
-from facelib.utils.misc import img2tensor, imwrite
+from facelib.utils.misc import img2tensor, imwrite, is_gray, bgr2gray
 
 
 def get_largest_face(det_faces, h, w):
@@ -125,6 +125,9 @@ class FaceRestoreHelper(object):
             img = img[:, :, 0:3]
 
         self.input_img = img
+        self.is_gray = is_gray(img, threshold=5)
+        if self.is_gray:
+            print('Grayscale input: True')
 
         if min(self.input_img.shape[:2])<512:
             f = 512.0/min(self.input_img.shape[:2])
@@ -415,6 +418,9 @@ class FaceRestoreHelper(object):
                 # pasted_face = inv_restored
                 fuse_mask = (inv_soft_parse_mask<inv_soft_mask).astype('int')
                 inv_soft_mask = inv_soft_parse_mask*fuse_mask + inv_soft_mask*(1-fuse_mask)
+
+            if self.is_gray:
+                pasted_face = bgr2gray(pasted_face) # convert img into grayscale
 
             if len(upsample_img.shape) == 3 and upsample_img.shape[2] == 4:  # alpha channel
                 alpha = upsample_img[:, :, 3:]
