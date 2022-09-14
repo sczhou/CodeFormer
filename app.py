@@ -199,12 +199,13 @@ description = r"""<center><img src='https://user-images.githubusercontent.com/14
 🤗 Try CodeFormer for improved stable-diffusion generation!<br>
 """
 article = r"""
-If CodeFormer is helpful, please help to ⭐ the <a href='https://github.com/sczhou/CodeFormer' target='_blank'>Github Repo</a>. Thanks!
+If CodeFormer is helpful, please help to ⭐ the <a href='https://github.com/sczhou/CodeFormer' target='_blank'>Github Repo</a>. Thanks! 
 [![GitHub Stars](https://img.shields.io/github/stars/sczhou/CodeFormer?style=social)](https://github.com/sczhou/CodeFormer)
 
 ---
 
-📝 Citation
+📝 **Citation**
+
 If our work is useful for your research, please consider citing:
 ```bibtex
 @article{zhou2022codeformer,
@@ -215,7 +216,8 @@ If our work is useful for your research, please consider citing:
 }
 ```
 
-📧 Contact
+📧 **Contact**
+
 If you have any questions, please feel free to reach me out at <b>shangchenzhou@gmail.com</b>.
 
 ![visitors](https://visitor-badge.glitch.me/badge?page_id=sczhou/CodeFormer)
@@ -227,7 +229,7 @@ gr.Interface(
         gr.inputs.Checkbox(default=True, label="Background_Enhance"),
         gr.inputs.Checkbox(default=True, label="Face_Upsample"),
         gr.inputs.Number(default=2, label="Rescaling_Factor"),
-        gr.Slider(0, 1, value=0.5, step=0.01, label='Codeformer_Fidelity, 0 for better quality, 1 for better identity')
+        gr.Slider(0, 1, value=0.5, step=0.01, label='Codeformer_Fidelity: 0 for better quality, 1 for better identity')
     ], [
         gr.outputs.Image(type="numpy", label="Output"),
     ],
