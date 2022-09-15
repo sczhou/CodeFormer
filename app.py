@@ -194,7 +194,7 @@ def inference(image, background_enhance, face_upsample, upscale, codeformer_fide
 
 title = "CodeFormer: Robust Face Restoration and Enhancement Network"
 description = r"""<center><img src='https://user-images.githubusercontent.com/14334509/189166076-94bb2cac-4f4e-40fb-a69f-66709e3d98f5.png' alt='CodeFormer logo'></center>
-<b>Official Gradio demo</b> for <a href='https://github.com/sczhou/CodeFormer' target='_blank'><b>Towards Robust Blind Face Restoration with Codebook Lookup Transformer</b></a>.<br>
+<b>Official Gradio demo</b> for <a href='https://github.com/sczhou/CodeFormer' target='_blank'><b>Towards Robust Blind Face Restoration with Codebook Lookup Transformer (NeurIPS 2022)</b></a>.<br>
 🔥 CodeFormer is a robust face restoration algorithm for old photos or AI-generated faces.<br>
 🤗 Try CodeFormer for improved stable-diffusion generation!<br>
 """
@@ -208,13 +208,18 @@ If CodeFormer is helpful, please help to ⭐ the <a href='https://github.com/scz
 
 If our work is useful for your research, please consider citing:
 ```bibtex
-@article{zhou2022codeformer,
+@inproceedings{zhou2022codeformer,
     author = {Zhou, Shangchen and Chan, Kelvin C.K. and Li, Chongyi and Loy, Chen Change},
     title = {Towards Robust Blind Face Restoration with Codebook Lookup TransFormer},
-    journal = {arXiv preprint arXiv:2206.11253},
+    booktitle = {NeurIPS},
     year = {2022}
 }
 ```
+
+📋 **License**
+
+This project is licensed under <a rel="license" href="https://github.com/sczhou/CodeFormer/blob/master/LICENSE">S-Lab License 1.0</a>. 
+Redistribution and use for non-commercial purposes should follow this license.
 
 📧 **Contact**
 

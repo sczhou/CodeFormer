@@ -2,7 +2,7 @@
   <img src="assets/CodeFormer_logo.png" height=110>
 </p>
 
-## Towards Robust Blind Face Restoration with Codebook Lookup Transformer
+## Towards Robust Blind Face Restoration with Codebook Lookup Transformer (NeurIPS 2022)
 
 [Paper](https://arxiv.org/abs/2206.11253) | [Project Page](https://shangchenzhou.com/projects/CodeFormer/) | [Video](https://youtu.be/d3VDpkXlueI)
 
@@ -105,10 +105,10 @@ The results will be saved in the `results` folder.
 ### Citation
 If our work is useful for your research, please consider citing:
 
-    @article{zhou2022codeformer,
+    @inproceedings{zhou2022codeformer,
         author = {Zhou, Shangchen and Chan, Kelvin C.K. and Li, Chongyi and Loy, Chen Change},
         title = {Towards Robust Blind Face Restoration with Codebook Lookup TransFormer},
-        journal = {arXiv preprint arXiv:2206.11253},
+        booktitle = {NeurIPS},
         year = {2022}
     }
 
