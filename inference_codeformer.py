@@ -43,7 +43,6 @@ if __name__ == '__main__':
 
     parser.add_argument('--w', type=float, default=0.5, help='Balance the quality and fidelity')
     parser.add_argument('--upscale', type=int, default=2, help='The final upsampling scale of the image. Default: 2')
-    parser.add_argument('--test_path', type=str, default='./inputs/cropped_faces')
     parser.add_argument('--has_aligned', action='store_true', help='Input are cropped and aligned faces')
     parser.add_argument('--only_center_face', action='store_true', help='Only restore the center face')
     # large det_model: 'YOLOv5l', 'retinaface_resnet50'
@@ -54,14 +53,24 @@ if __name__ == '__main__':
     parser.add_argument('--face_upsample', action='store_true', help='face upsampler after enhancement.')
     parser.add_argument('--bg_tile', type=int, default=400, help='Tile size for background sampler. Default: 400')
 
+    input_arg_group = parser.add_mutually_exclusive_group(required=True)
+    input_arg_group.add_argument('--test_path', type=str, help="The folder where input files are stored. Mutually exclusive with --input_files")
+    input_arg_group.add_argument('--input_files', type=str, nargs='+', help="List of files to process. Mutually exclusive with --test_path")
+
     args = parser.parse_args()
 
     # ------------------------ input & output ------------------------
-    if args.test_path.endswith('/'):  # solve when path ends with /
-        args.test_path = args.test_path[:-1]
-
     w = args.w
-    result_root = f'results/{os.path.basename(args.test_path)}_{w}'
+
+    if args.test_path is not None:
+        if args.test_path.endswith('/'):  # solve when path ends with /
+            args.test_path = args.test_path[:-1]
+        # scan all the jpg and png images
+        input_img_list = sorted(glob.glob(os.path.join(args.test_path, '*.[jp][pn]g')))
+        result_root = f'results/{os.path.basename(args.test_path)}_{w}'
+    else:
+        input_img_list = args.input_files
+        result_root = f'results/{w}'
 
     # ------------------ set up background upsampler ------------------
     if args.bg_upsampler == 'realesrgan':
@@ -109,8 +118,7 @@ if __name__ == '__main__':
         device=device)
 
     # -------------------- start to processing ---------------------
-    # scan all the jpg and png images
-    for img_path in sorted(glob.glob(os.path.join(args.test_path, '*.[jp][pn]g'))):
+    for img_path in input_img_list:
         # clean all the intermediate results to process the next image
         face_helper.clean_all()
         

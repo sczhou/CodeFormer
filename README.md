@@ -96,6 +96,9 @@ python inference_codeformer.py --w 0.5 --has_aligned --test_path [input folder]
 # Add '--bg_upsampler realesrgan' to enhance the background regions with Real-ESRGAN
 # Add '--face_upsample' to further upsample restorated face with Real-ESRGAN
 python inference_codeformer.py --w 0.7 --test_path [input folder]
+
+# Passing individual files
+python inference_codeformer.py --w 0.7 --input_files [input files]
 ```
 
 NOTE that *w* is in [0, 1]. Generally, smaller *w* tends to produce a higher-quality result, while larger *w* yields a higher-fidelity result. 
