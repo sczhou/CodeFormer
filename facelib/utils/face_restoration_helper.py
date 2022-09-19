@@ -299,6 +299,8 @@ class FaceRestoreHelper(object):
 
 
     def add_restored_face(self, face):
+        if self.is_gray:
+            face = bgr2gray(face) # convert img into grayscale
         self.restored_faces.append(face)
 
 
@@ -418,9 +420,6 @@ class FaceRestoreHelper(object):
                 # pasted_face = inv_restored
                 fuse_mask = (inv_soft_parse_mask<inv_soft_mask).astype('int')
                 inv_soft_mask = inv_soft_parse_mask*fuse_mask + inv_soft_mask*(1-fuse_mask)
-
-            if self.is_gray:
-                pasted_face = bgr2gray(pasted_face) # convert img into grayscale
 
             if len(upsample_img.shape) == 3 and upsample_img.shape[2] == 4:  # alpha channel
                 alpha = upsample_img[:, :, 3:]

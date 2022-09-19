@@ -1,4 +1,3 @@
-# Modified by Shangchen Zhou from: https://github.com/TencentARC/GFPGAN/blob/master/inference_gfpgan.py
 import os
 import cv2
 import argparse
@@ -8,6 +7,7 @@ from torchvision.transforms.functional import normalize
 from basicsr.utils import imwrite, img2tensor, tensor2img
 from basicsr.utils.download_util import load_file_from_url
 from facelib.utils.face_restoration_helper import FaceRestoreHelper
+from facelib.utils.misc import is_gray
 import torch.nn.functional as F
 
 from basicsr.utils.registry import ARCH_REGISTRY
@@ -122,6 +122,9 @@ if __name__ == '__main__':
         if args.has_aligned: 
             # the input faces are already cropped and aligned
             img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_LINEAR)
+            face_helper.is_gray = is_gray(img, threshold=5)
+            if face_helper.is_gray:
+                print('Grayscale input: True')
             face_helper.cropped_faces = [img]
         else:
             face_helper.read_image(img)
