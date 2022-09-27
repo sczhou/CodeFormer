@@ -16,6 +16,7 @@ from torchvision.transforms.functional import normalize
 from basicsr.utils import imwrite, img2tensor, tensor2img
 from basicsr.utils.download_util import load_file_from_url
 from facelib.utils.face_restoration_helper import FaceRestoreHelper
+from facelib.utils.misc import is_gray
 from basicsr.archs.rrdbnet_arch import RRDBNet
 from basicsr.utils.realesrgan_utils import RealESRGANer
 
@@ -108,6 +109,7 @@ def inference(image, background_enhance, face_upsample, upscale, codeformer_fide
     draw_box = False
     detection_model = "retinaface_resnet50"
 
+    upscale = int(upscale) # covert type to int
     face_helper = FaceRestoreHelper(
         upscale,
         face_size=512,
@@ -125,6 +127,9 @@ def inference(image, background_enhance, face_upsample, upscale, codeformer_fide
     if has_aligned:
         # the input faces are already cropped and aligned
         img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_LINEAR)
+        face_helper.is_gray = is_gray(img, threshold=5)
+        if face_helper.is_gray:
+            print('Grayscale input: True')
         face_helper.cropped_faces = [img]
     else:
         face_helper.read_image(img)
@@ -228,7 +233,7 @@ If you have any questions, please feel free to reach me out at <b>shangchenzhou@
 ![visitors](https://visitor-badge.glitch.me/badge?page_id=sczhou/CodeFormer)
 """
 
-gr.Interface(
+demo = gr.Interface(
     inference, [
         gr.inputs.Image(type="filepath", label="Input"),
         gr.inputs.Checkbox(default=True, label="Background_Enhance"),
@@ -249,3 +254,6 @@ gr.Interface(
         ['05.jpg', True, True, 2, 0.1]
       ]
     ).launch()
+
+demo.queue(concurrency_count=4)
+demo.launch()
