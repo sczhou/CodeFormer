@@ -78,7 +78,7 @@ python basicsr/setup.py develop
 
 ### Quick Inference
 
-##### Download Pre-trained Models:
+#### Download Pre-trained Models:
 Download the facelib pretrained models from [[Google Drive](https://drive.google.com/drive/folders/1b_3qwrzY_kTQh0-SnBoGBgOrJ_PLZSKm?usp=sharing) | [OneDrive](https://entuedu-my.sharepoint.com/:f:/g/personal/s200094_e_ntu_edu_sg/EvDxR7FcAbZMp_MA9ouq7aQB8XTppMb3-T0uGZ_2anI2mg?e=DXsJFo)] to the `weights/facelib` folder. You can manually download the pretrained models OR download by runing the following command.
 ```
 python scripts/download_pretrained_models.py facelib
@@ -89,22 +89,24 @@ Download the CodeFormer pretrained models from [[Google Drive](https://drive.goo
 python scripts/download_pretrained_models.py CodeFormer
 ```
 
-##### Prepare Testing Data:
+#### Prepare Testing Data:
 You can put the testing images in the `inputs/TestWhole` folder. If you would like to test on cropped and aligned faces, you can put them in the `inputs/cropped_faces` folder.
 
 
-##### Testing on Face Restoration:
+#### Testing on Face Restoration:
+[Note] when comparing our model in your paper, please run the following command indicating `--has_aligned` (for cropped and aligned faces), as the command for the whole image will involve a process of face-background fusion that may damage hair texture on the boundary, which leads to unfair comparison.
 ```
 # For cropped and aligned faces
 python inference_codeformer.py --w 0.5 --has_aligned --test_path [input folder]
-
+```
+```
 # For the whole images
 # Add '--bg_upsampler realesrgan' to enhance the background regions with Real-ESRGAN
 # Add '--face_upsample' to further upsample restorated face with Real-ESRGAN
 python inference_codeformer.py --w 0.7 --test_path [input folder]
 ```
 
-NOTE that *w* is in [0, 1]. Generally, smaller *w* tends to produce a higher-quality result, while larger *w* yields a higher-fidelity result. 
+Fidelity weight *w* lays in [0, 1]. Generally, smaller *w* tends to produce a higher-quality result, while larger *w* yields a higher-fidelity result. 
 
 The results will be saved in the `results` folder.
 
