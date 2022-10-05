@@ -17,25 +17,36 @@ pretrain_model_url = {
 }
 
 def set_realesrgan():
-    if not torch.cuda.is_available():  # CPU
+    from basicsr.archs.rrdbnet_arch import RRDBNet
+    from basicsr.utils.realesrgan_utils import RealESRGANer
+
+    cuda_is_available = torch.cuda.is_available()
+    half = True if cuda_is_available else False
+    model = RRDBNet(
+        num_in_ch=3,
+        num_out_ch=3,
+        num_feat=64,
+        num_block=23,
+        num_grow_ch=32,
+        scale=2,
+    )
+    upsampler = RealESRGANer(
+        scale=2,
+        model_path="https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/RealESRGAN_x2plus.pth",
+        model=model,
+        tile=args.bg_tile,
+        tile_pad=40,
+        pre_pad=0,
+        half=half, # need to set False in CPU mode
+    )
+
+    if not cuda_is_available:  # CPU
         import warnings
-        warnings.warn('The unoptimized RealESRGAN is slow on CPU. We do not use it. '
-                        'If you really want to use it, please modify the corresponding codes.',
+        warnings.warn('Runing on CPU now... '
+                        'The unoptimized RealESRGAN is slow on CPU. '
+                        'If you want to disable it, please remove `--bg_upsampler` and `--face_upsample` in command.',
                         category=RuntimeWarning)
-        bg_upsampler = None
-    else:
-        from basicsr.archs.rrdbnet_arch import RRDBNet
-        from basicsr.utils.realesrgan_utils import RealESRGANer
-        model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=2)
-        bg_upsampler = RealESRGANer(
-            scale=2,
-            model_path='https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.1/RealESRGAN_x2plus.pth',
-            model=model,
-            tile=args.bg_tile,
-            tile_pad=40,
-            pre_pad=0,
-            half=True)  # need to set False in CPU mode
-    return bg_upsampler
+    return upsampler
 
 if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -71,10 +82,11 @@ if __name__ == '__main__':
 
     # ------------------ set up face upsampler ------------------
     if args.face_upsample:
-        if bg_upsampler is not None:
-            face_upsampler = bg_upsampler
-        else:
-            face_upsampler = set_realesrgan()
+        face_upsampler = None
+        # if bg_upsampler is not None:
+        #     face_upsampler = bg_upsampler
+        # else:
+        #     face_upsampler = set_realesrgan()
     else:
         face_upsampler = None
 

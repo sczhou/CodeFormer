@@ -193,7 +193,7 @@ def inference(image, background_enhance, face_upsample, upscale, codeformer_fide
     imwrite(restored_img, str(save_path))
 
     restored_img = cv2.cvtColor(restored_img, cv2.COLOR_BGR2RGB)
-    return restored_img
+    return restored_img, save_path
 
 
 
@@ -230,7 +230,7 @@ Redistribution and use for non-commercial purposes should follow this license.
 
 If you have any questions, please feel free to reach me out at <b>shangchenzhou@gmail.com</b>.
 
-![visitors](https://visitor-badge.glitch.me/badge?page_id=sczhou/CodeFormer)
+![visitors](https://visitor-badge.laobi.icu/badge?page_id=sczhou/CodeFormer)
 """
 
 demo = gr.Interface(
@@ -242,6 +242,7 @@ demo = gr.Interface(
         gr.Slider(0, 1, value=0.5, step=0.01, label='Codeformer_Fidelity: 0 for better quality, 1 for better identity')
     ], [
         gr.outputs.Image(type="numpy", label="Output"),
+        gr.outputs.File(label="Download the output")
     ],
     title=title,
     description=description,
