@@ -42,7 +42,7 @@ def set_realesrgan():
 
     if not cuda_is_available:  # CPU
         import warnings
-        warnings.warn('Runing on CPU now... '
+        warnings.warn('Running on CPU now! Make sure your PyTorch version matches your CUDA.'
                         'The unoptimized RealESRGAN is slow on CPU. '
                         'If you want to disable it, please remove `--bg_upsampler` and `--face_upsample` in command.',
                         category=RuntimeWarning)
@@ -68,11 +68,18 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # ------------------------ input & output ------------------------
-    if args.test_path.endswith('/'):  # solve when path ends with /
-        args.test_path = args.test_path[:-1]
-
     w = args.w
-    result_root = f'results/{os.path.basename(args.test_path)}_{w}'
+    if args.test_path.endswith(('jpg', 'png')): # input single img path
+        input_img_list = [args.test_path]
+        result_root = f'results/test_img_{w}'
+
+    else: # input img folder
+        if args.test_path.endswith('/'):  # solve when path ends with /
+            args.test_path = args.test_path[:-1]
+
+        input_img_list = sorted(glob.glob(os.path.join(args.test_path, '*.[jp][pn]g')))
+        result_root = f'results/{os.path.basename(args.test_path)}_{w}'
+    
 
     # ------------------ set up background upsampler ------------------
     if args.bg_upsampler == 'realesrgan':
@@ -122,7 +129,7 @@ if __name__ == '__main__':
 
     # -------------------- start to processing ---------------------
     # scan all the jpg and png images
-    for img_path in sorted(glob.glob(os.path.join(args.test_path, '*.[jp][pn]g'))):
+    for img_path in input_img_list:
         # clean all the intermediate results to process the next image
         face_helper.clean_all()
         
