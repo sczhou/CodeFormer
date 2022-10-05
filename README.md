@@ -23,6 +23,7 @@ S-Lab, Nanyang Technological University
 
 **[<font color=#d1585d>News</font>]**: :whale: *Due to copyright issues, we have to delay the release of the training code (expected by the end of this year). Please star and stay tuned for our future updates!* 
 ### Update
+- **2022.10.05**: Support video input `--test_path [YOUR_VIDOE.mp4]`. Try it to enhance your videos! :clapper: 
 - **2022.09.14**: Integrated to :hugs: [Hugging Face](https://huggingface.co/spaces). Try out online demo! [![Hugging Face](https://img.shields.io/badge/Demo-%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/spaces/sczhou/CodeFormer)
 - **2022.09.09**: Integrated to :rocket: [Replicate](https://replicate.com/explore). Try out online demo! [![Replicate](https://img.shields.io/badge/Demo-%F0%9F%9A%80%20Replicate-blue)](https://replicate.com/sczhou/codeformer)
 - **2022.09.04**: Add face upsampling `--face_upsample` for high-resolution AI-created face enhancement.
@@ -94,17 +95,29 @@ You can put the testing images in the `inputs/TestWhole` folder. If you would li
 
 
 #### Testing on Face Restoration:
-[Note] when comparing our model in your paper, please run the following command indicating `--has_aligned` (for cropped and aligned faces), as the command for the whole image will involve a process of face-background fusion that may damage hair texture on the boundary, which leads to unfair comparison.
+[Note] If you want to compare CodeFormer in your paper, please run the following command indicating `--has_aligned` (for cropped and aligned face), as the command for the whole image will involve a process of face-background fusion that may damage hair texture on the boundary, which leads to unfair comparison.
+
+👨🏻 Face Restoration (cropped and aligned face)
 ```
 # For cropped and aligned faces
 python inference_codeformer.py --w 0.5 --has_aligned --test_path [input folder]
 ```
+
+:framed_picture: Whole Image Enhancement
 ```
-# For the whole images
+# For whole image
 # Add '--bg_upsampler realesrgan' to enhance the background regions with Real-ESRGAN
 # Add '--face_upsample' to further upsample restorated face with Real-ESRGAN
-python inference_codeformer.py --w 0.7 --test_path [input folder/image path]
+python inference_codeformer.py --w 1.0 --test_path [input folder/image path]
 ```
+
+:clapper: Video Enhancement
+```
+# For video clips
+# Set frame rate of saved video via '--save_video_fps 24'
+python inference_codeformer.py --bg_upsampler realesrgan --face_upsample --w 0.7 --test_path [video path] --save_video_fps 24
+```
+
 
 Fidelity weight *w* lays in [0, 1]. Generally, smaller *w* tends to produce a higher-quality result, while larger *w* yields a higher-fidelity result. 
 

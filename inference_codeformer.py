@@ -64,6 +64,7 @@ if __name__ == '__main__':
     parser.add_argument('--bg_upsampler', type=str, default='None', help='background upsampler. Optional: realesrgan')
     parser.add_argument('--face_upsample', action='store_true', help='face upsampler after enhancement.')
     parser.add_argument('--bg_tile', type=int, default=400, help='Tile size for background sampler. Default: 400')
+    parser.add_argument('--save_video_fps', type=int, default=24, help='frame rate for saving video. Default: 24')
 
     args = parser.parse_args()
 
@@ -72,15 +73,24 @@ if __name__ == '__main__':
     if args.test_path.endswith(('jpg', 'png')): # input single img path
         input_img_list = [args.test_path]
         result_root = f'results/test_img_{w}'
-
+    elif args.test_path.endswith(('mp4', 'mov', 'avi')): # input video path
+        input_img_list = []
+        vidcap = cv2.VideoCapture(args.test_path)
+        success, image = vidcap.read()
+        while success:
+            input_img_list.append(image)
+            success, image = vidcap.read()
+        input_video = True
+        video_name = os.path.basename(args.test_path)[:-4]
+        result_root = f'results/{video_name}_{w}'
     else: # input img folder
         if args.test_path.endswith('/'):  # solve when path ends with /
             args.test_path = args.test_path[:-1]
-
+        # scan all the jpg and png images
         input_img_list = sorted(glob.glob(os.path.join(args.test_path, '*.[jp][pn]g')))
         result_root = f'results/{os.path.basename(args.test_path)}_{w}'
     
-
+    test_img_num = len(input_img_list)
     # ------------------ set up background upsampler ------------------
     if args.bg_upsampler == 'realesrgan':
         bg_upsampler = set_realesrgan()
@@ -128,15 +138,20 @@ if __name__ == '__main__':
         device=device)
 
     # -------------------- start to processing ---------------------
-    # scan all the jpg and png images
-    for img_path in input_img_list:
+    for i, img_path in enumerate(input_img_list):
         # clean all the intermediate results to process the next image
         face_helper.clean_all()
         
-        img_name = os.path.basename(img_path)
-        print(f'Processing: {img_name}')
-        basename, ext = os.path.splitext(img_name)
-        img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+        if isinstance(img_path, str):
+            img_name = os.path.basename(img_path)
+            basename, ext = os.path.splitext(img_name)
+            print(f'[{i+1}/{test_img_num}] Processing: {img_name}')
+            img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+        else: # for video processing
+            basename = str(i).zfill(6)
+            img_name = f'{video_name}_{basename}' if input_video else basename
+            print(f'[{i+1}/{test_img_num}] Processing: {img_name}')
+            img = img_path
 
         if args.has_aligned: 
             # the input faces are already cropped and aligned
@@ -207,5 +222,22 @@ if __name__ == '__main__':
         if not args.has_aligned and restored_img is not None:
             save_restore_path = os.path.join(result_root, 'final_results', f'{basename}.png')
             imwrite(restored_img, save_restore_path)
+
+    # save enhanced video
+    if input_video:
+        # load images
+        video_frames = []
+        img_list = sorted(glob.glob(os.path.join(result_root, 'final_results', '*.[jp][pn]g')))
+        for img_path in img_list:
+            img = cv2.imread(img_path)
+            video_frames.append(img)
+        # write images to video
+        h, w = video_frames[0].shape[:2]
+        save_restore_path = os.path.join(result_root, f'{video_name}.mp4')
+        writer = cv2.VideoWriter(save_restore_path, cv2.VideoWriter_fourcc(*"mp4v"),
+                                    args.save_video_fps, (w, h))            
+        for f in video_frames:
+            writer.write(f)
+        writer.release()
 
     print(f'\nAll results are saved in {result_root}')
