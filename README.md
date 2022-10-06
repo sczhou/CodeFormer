@@ -97,7 +97,7 @@ You can put the testing images in the `inputs/TestWhole` folder. If you would li
 #### Testing on Face Restoration:
 [Note] If you want to compare CodeFormer in your paper, please run the following command indicating `--has_aligned` (for cropped and aligned face), as the command for the whole image will involve a process of face-background fusion that may damage hair texture on the boundary, which leads to unfair comparison.
 
-👨🏻 Face Restoration (cropped and aligned face)
+🧑🏻 Face Restoration (cropped and aligned face)
 ```
 # For cropped and aligned faces
 python inference_codeformer.py --w 0.5 --has_aligned --test_path [input folder]

@@ -52,9 +52,10 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--w', type=float, default=0.5, help='Balance the quality and fidelity')
-    parser.add_argument('--upscale', type=int, default=2, help='The final upsampling scale of the image. Default: 2')
-    parser.add_argument('--test_path', type=str, default='./inputs/cropped_faces')
+    parser.add_argument('-i', '--test_path', type=str, default='./inputs/cropped_faces')
+    parser.add_argument('-o', '--save_path', type=str, default=None)
+    parser.add_argument('-w', '--w', type=float, default=0.5, help='Balance the quality and fidelity')
+    parser.add_argument('-s', '--upscale', type=int, default=2, help='The final upsampling scale of the image. Default: 2')
     parser.add_argument('--has_aligned', action='store_true', help='Input are cropped and aligned faces')
     parser.add_argument('--only_center_face', action='store_true', help='Only restore the center face')
     # large det_model: 'YOLOv5l', 'retinaface_resnet50'
@@ -64,12 +65,14 @@ if __name__ == '__main__':
     parser.add_argument('--bg_upsampler', type=str, default='None', help='background upsampler. Optional: realesrgan')
     parser.add_argument('--face_upsample', action='store_true', help='face upsampler after enhancement.')
     parser.add_argument('--bg_tile', type=int, default=400, help='Tile size for background sampler. Default: 400')
+    parser.add_argument('--suffix', type=str, default=None, help='Suffix of the restored faces')
     parser.add_argument('--save_video_fps', type=int, default=24, help='frame rate for saving video. Default: 24')
 
     args = parser.parse_args()
 
     # ------------------------ input & output ------------------------
     w = args.w
+
     if args.test_path.endswith(('jpg', 'png')): # input single img path
         input_img_list = [args.test_path]
         result_root = f'results/test_img_{w}'
@@ -89,7 +92,10 @@ if __name__ == '__main__':
         # scan all the jpg and png images
         input_img_list = sorted(glob.glob(os.path.join(args.test_path, '*.[jp][pn]g')))
         result_root = f'results/{os.path.basename(args.test_path)}_{w}'
-    
+
+    if not args.save_path is None: # set output path
+        result_root = args.save_path
+
     test_img_num = len(input_img_list)
     # ------------------ set up background upsampler ------------------
     if args.bg_upsampler == 'realesrgan':
@@ -215,11 +221,15 @@ if __name__ == '__main__':
                 save_face_name = f'{basename}.png'
             else:
                 save_face_name = f'{basename}_{idx:02d}.png'
+            if args.suffix is not None:
+                save_face_name = f'{save_face_name[:-4]}_{args.suffix}.png'
             save_restore_path = os.path.join(result_root, 'restored_faces', save_face_name)
             imwrite(restored_face, save_restore_path)
 
         # save restored img
         if not args.has_aligned and restored_img is not None:
+            if args.suffix is not None:
+                basename = f'{basename}_{args.suffix}'
             save_restore_path = os.path.join(result_root, 'final_results', f'{basename}.png')
             imwrite(restored_img, save_restore_path)
 
