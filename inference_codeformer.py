@@ -72,6 +72,7 @@ if __name__ == '__main__':
 
     # ------------------------ input & output ------------------------
     w = args.w
+    input_video = False
 
     if args.test_path.endswith(('jpg', 'png')): # input single img path
         input_img_list = [args.test_path]
