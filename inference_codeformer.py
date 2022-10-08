@@ -52,49 +52,55 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-i', '--test_path', type=str, default='./inputs/cropped_faces')
-    parser.add_argument('-o', '--save_path', type=str, default=None)
-    parser.add_argument('-w', '--w', type=float, default=0.5, help='Balance the quality and fidelity')
-    parser.add_argument('-s', '--upscale', type=int, default=2, help='The final upsampling scale of the image. Default: 2')
-    parser.add_argument('--has_aligned', action='store_true', help='Input are cropped and aligned faces')
-    parser.add_argument('--only_center_face', action='store_true', help='Only restore the center face')
+    parser.add_argument('-i', '--input_path', type=str, default='./inputs/whole_imgs', 
+            help='Input image, video or folder. Default: inputs/whole_imgs')
+    parser.add_argument('-o', '--output_path', type=str, default=None, 
+            help='Output folder. Default: results/<input_name>_<w>')
+    parser.add_argument('-w', '--fidelity_weight', type=float, default=0.5, 
+            help='Balance the quality and fidelity')
+    parser.add_argument('-s', '--upscale', type=int, default=2, 
+            help='The final upsampling scale of the image. Default: 2')
+    parser.add_argument('--has_aligned', action='store_true', help='Input are cropped and aligned faces. Default: False')
+    parser.add_argument('--only_center_face', action='store_true', help='Only restore the center face. Default: False')
+    parser.add_argument('--draw_box', action='store_true', help='Draw the bounding box for the detected faces. Default: False')
     # large det_model: 'YOLOv5l', 'retinaface_resnet50'
     # small det_model: 'YOLOv5n', 'retinaface_mobile0.25'
-    parser.add_argument('--detection_model', type=str, default='retinaface_resnet50')
-    parser.add_argument('--draw_box', action='store_true')
-    parser.add_argument('--bg_upsampler', type=str, default='None', help='background upsampler. Optional: realesrgan')
-    parser.add_argument('--face_upsample', action='store_true', help='face upsampler after enhancement.')
+    parser.add_argument('--detection_model', type=str, default='retinaface_resnet50', 
+            help='Face detector. Optional: retinaface_resnet50, retinaface_mobile0.25, YOLOv5l, YOLOv5n. \
+                Default: retinaface_resnet50')
+    parser.add_argument('--bg_upsampler', type=str, default='None', help='Background upsampler. Optional: realesrgan')
+    parser.add_argument('--face_upsample', action='store_true', help='Face upsampler after enhancement. Default: False')
     parser.add_argument('--bg_tile', type=int, default=400, help='Tile size for background sampler. Default: 400')
-    parser.add_argument('--suffix', type=str, default=None, help='Suffix of the restored faces')
-    parser.add_argument('--save_video_fps', type=int, default=24, help='frame rate for saving video. Default: 24')
+    parser.add_argument('--suffix', type=str, default=None, help='Suffix of the restored faces. Default: None')
+    parser.add_argument('--save_video_fps', type=int, default=24, help='Frame rate for saving video. Default: 24')
 
     args = parser.parse_args()
 
     # ------------------------ input & output ------------------------
     w = args.w
-
-    if args.test_path.endswith(('jpg', 'png')): # input single img path
-        input_img_list = [args.test_path]
+    input_video = False
+    if args.input_path.endswith(('jpg', 'png')): # input single img path
+        input_img_list = [args.input_path]
         result_root = f'results/test_img_{w}'
-    elif args.test_path.endswith(('mp4', 'mov', 'avi')): # input video path
+    elif args.input_path.endswith(('mp4', 'mov', 'avi')): # input video path
         input_img_list = []
-        vidcap = cv2.VideoCapture(args.test_path)
+        vidcap = cv2.VideoCapture(args.input_path)
         success, image = vidcap.read()
         while success:
             input_img_list.append(image)
             success, image = vidcap.read()
         input_video = True
-        video_name = os.path.basename(args.test_path)[:-4]
+        video_name = os.path.basename(args.input_path)[:-4]
         result_root = f'results/{video_name}_{w}'
     else: # input img folder
-        if args.test_path.endswith('/'):  # solve when path ends with /
-            args.test_path = args.test_path[:-1]
+        if args.input_path.endswith('/'):  # solve when path ends with /
+            args.input_path = args.input_path[:-1]
         # scan all the jpg and png images
-        input_img_list = sorted(glob.glob(os.path.join(args.test_path, '*.[jp][pn]g')))
-        result_root = f'results/{os.path.basename(args.test_path)}_{w}'
+        input_img_list = sorted(glob.glob(os.path.join(args.input_path, '*.[jp][pn]g')))
+        result_root = f'results/{os.path.basename(args.input_path)}_{w}'
 
-    if not args.save_path is None: # set output path
-        result_root = args.save_path
+    if not args.output_path is None: # set output path
+        result_root = args.output_path
 
     test_img_num = len(input_img_list)
     # ------------------ set up background upsampler ------------------
@@ -243,6 +249,8 @@ if __name__ == '__main__':
             video_frames.append(img)
         # write images to video
         h, w = video_frames[0].shape[:2]
+        if args.suffix is not None:
+            video_name = f'{video_name}_{args.suffix}.png'
         save_restore_path = os.path.join(result_root, f'{video_name}.mp4')
         writer = cv2.VideoWriter(save_restore_path, cv2.VideoWriter_fourcc(*"mp4v"),
                                     args.save_video_fps, (w, h))            
