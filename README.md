@@ -36,6 +36,7 @@ S-Lab, Nanyang Technological University
 
 ### TODO
 - [ ] Add checkpoint for face inpainting
+- [ ] Add checkpoint for face colorization
 - [ ] Add training code and config files
 - [x] ~~Add background image enhancement~~
 
