@@ -41,10 +41,10 @@ class VectorQuantizer(nn.Module):
 
         mean_distance = torch.mean(d)
         # find closest encodings
-        # min_encoding_indices = torch.argmin(d, dim=1).unsqueeze(1)
-        min_encoding_scores, min_encoding_indices = torch.topk(d, 1, dim=1, largest=False)
+        min_encoding_indices = torch.argmin(d, dim=1).unsqueeze(1)
+        # min_encoding_scores, min_encoding_indices = torch.topk(d, 1, dim=1, largest=False)
         # [0-1], higher score, higher confidence
-        min_encoding_scores = torch.exp(-min_encoding_scores/10)
+        # min_encoding_scores = torch.exp(-min_encoding_scores/10)
 
         min_encodings = torch.zeros(min_encoding_indices.shape[0], self.codebook_size).to(z)
         min_encodings.scatter_(1, min_encoding_indices, 1)
@@ -66,7 +66,6 @@ class VectorQuantizer(nn.Module):
             "perplexity": perplexity,
             "min_encodings": min_encodings,
             "min_encoding_indices": min_encoding_indices,
-            "min_encoding_scores": min_encoding_scores,
             "mean_distance": mean_distance
             }
 
