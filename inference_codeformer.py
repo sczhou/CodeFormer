@@ -72,7 +72,7 @@ if __name__ == '__main__':
     parser.add_argument('--face_upsample', action='store_true', help='Face upsampler after enhancement. Default: False')
     parser.add_argument('--bg_tile', type=int, default=400, help='Tile size for background sampler. Default: 400')
     parser.add_argument('--suffix', type=str, default=None, help='Suffix of the restored faces. Default: None')
-    parser.add_argument('--save_video_fps', type=int, default=24, help='Frame rate for saving video. Default: 24')
+    parser.add_argument('--save_video_fps', type=float, default=None, help='Frame rate for saving video. Default: None')
 
     args = parser.parse_args()
 
@@ -83,15 +83,19 @@ if __name__ == '__main__':
         input_img_list = [args.input_path]
         result_root = f'results/test_img_{w}'
     elif args.input_path.endswith(('mp4', 'mov', 'avi')): # input video path
+        from basicsr.utils.video_util import VideoReader, VideoWriter
         input_img_list = []
-        vidcap = cv2.VideoCapture(args.input_path)
-        success, image = vidcap.read()
-        while success:
+        vidreader = VideoReader(args.input_path)
+        image = vidreader.get_frame()
+        while image is not None:
             input_img_list.append(image)
-            success, image = vidcap.read()
-        input_video = True
+            image = vidreader.get_frame()
+        audio = vidreader.get_audio()
+        fps = vidreader.get_fps() if args.save_video_fps is None else args.save_video_fps   
         video_name = os.path.basename(args.input_path)[:-4]
         result_root = f'results/{video_name}_{w}'
+        input_video = True
+        vidreader.close()
     else: # input img folder
         if args.input_path.endswith('/'):  # solve when path ends with /
             args.input_path = args.input_path[:-1]
@@ -241,6 +245,7 @@ if __name__ == '__main__':
 
     # save enhanced video
     if input_video:
+        print('Video Saving...')
         # load images
         video_frames = []
         img_list = sorted(glob.glob(os.path.join(result_root, 'final_results', '*.[jp][pn]g')))
@@ -248,14 +253,14 @@ if __name__ == '__main__':
             img = cv2.imread(img_path)
             video_frames.append(img)
         # write images to video
-        h, w = video_frames[0].shape[:2]
+        height, width = video_frames[0].shape[:2]
         if args.suffix is not None:
             video_name = f'{video_name}_{args.suffix}.png'
         save_restore_path = os.path.join(result_root, f'{video_name}.mp4')
-        writer = cv2.VideoWriter(save_restore_path, cv2.VideoWriter_fourcc(*"mp4v"),
-                                    args.save_video_fps, (w, h))            
+        vidwriter = VideoWriter(save_restore_path, height, width, fps, audio)
+         
         for f in video_frames:
-            writer.write(f)
-        writer.release()
+            vidwriter.write_frame(f)
+        vidwriter.close()
 
     print(f'\nAll results are saved in {result_root}')

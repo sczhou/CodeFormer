@@ -7,13 +7,13 @@ import torch
 from torch.hub import download_url_to_file, get_dir
 from urllib.parse import urlparse
 # from basicsr.utils.download_util import download_file_from_google_drive
-import gdown
-
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def download_pretrained_models(file_ids, save_path_root):
+    import gdown
+    
     os.makedirs(save_path_root, exist_ok=True)
 
     for file_name, file_id in file_ids.items():
