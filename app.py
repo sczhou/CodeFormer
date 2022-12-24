@@ -109,8 +109,21 @@ def inference(image, background_enhance, face_upsample, upscale, codeformer_fide
         only_center_face = False
         draw_box = False
         detection_model = "retinaface_resnet50"
+        print('Inp:', image, background_enhance, face_upsample, upscale, codeformer_fidelity)
+
+        img = cv2.imread(str(image), cv2.IMREAD_COLOR)
+        print('\timage size:', img.shape)
 
         upscale = int(upscale) # covert type to int
+        if upscale > 4: # avoid momory exceeded due to too large upscale
+            upscale = 4 
+        if upscale > 2 and max(img.shape[:2])>1000: # avoid momory exceeded due to too large img resolution
+            upscale = 2 
+        if max(img.shape[:2]) > 1500: # avoid momory exceeded due to too large img resolution
+            upscale = 1
+            background_enhance = False
+            face_upsample = False
+
         face_helper = FaceRestoreHelper(
             upscale,
             face_size=512,
@@ -123,14 +136,12 @@ def inference(image, background_enhance, face_upsample, upscale, codeformer_fide
         bg_upsampler = upsampler if background_enhance else None
         face_upsampler = upsampler if face_upsample else None
 
-        img = cv2.imread(str(image), cv2.IMREAD_COLOR)
-
         if has_aligned:
             # the input faces are already cropped and aligned
             img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_LINEAR)
             face_helper.is_gray = is_gray(img, threshold=5)
             if face_helper.is_gray:
-                print('Grayscale input: True')
+                print('\tgrayscale input: True')
             face_helper.cropped_faces = [img]
         else:
             face_helper.read_image(img)
@@ -138,7 +149,7 @@ def inference(image, background_enhance, face_upsample, upscale, codeformer_fide
             num_det_faces = face_helper.get_face_landmarks_5(
             only_center_face=only_center_face, resize=640, eye_dist_threshold=5
             )
-            print(f"\tdetect {num_det_faces} faces")
+            print(f'\tdetect {num_det_faces} faces')
             # align and warp each face
             face_helper.align_warp_face()
 
@@ -159,8 +170,8 @@ def inference(image, background_enhance, face_upsample, upscale, codeformer_fide
                     restored_face = tensor2img(output, rgb2bgr=True, min_max=(-1, 1))
                 del output
                 torch.cuda.empty_cache()
-            except Exception as error:
-                print(f"\tFailed inference for CodeFormer: {error}")
+            except RuntimeError as error:
+                print(f"Failed inference for CodeFormer: {error}")
                 restored_face = tensor2img(
                     cropped_face_t, rgb2bgr=True, min_max=(-1, 1)
                 )
@@ -196,7 +207,7 @@ def inference(image, background_enhance, face_upsample, upscale, codeformer_fide
         restored_img = cv2.cvtColor(restored_img, cv2.COLOR_BGR2RGB)
         return restored_img, save_path
     except Exception as error:
-        print('global exception', error)
+        print('Global exception', error)
         return None, None
 
 
@@ -233,7 +244,13 @@ Redistribution and use for non-commercial purposes should follow this license.
 
 If you have any questions, please feel free to reach me out at <b>shangchenzhou@gmail.com</b>.
 
-![visitors](https://visitor-badge.laobi.icu/badge?page_id=sczhou/CodeFormer)
+<div>
+    🤗 Find Me:
+    <a href="https://twitter.com/ShangchenZhou"><img style="margin-top:0.5em; margin-bottom:0.5em" src="https://img.shields.io/twitter/follow/ShangchenZhou?label=%40ShangchenZhou&style=social" alt="Twitter Follow"></a> 
+    <a href="https://github.com/sczhou"><img style="margin-top:0.5em; margin-bottom:2em" src="https://img.shields.io/github/followers/sczhou?style=social" alt="Github Follow"></a>
+</div>
+
+<center><img src='https://visitor-badge.laobi.icu/badge?page_id=sczhou/CodeFormer' alt='visitors'></center>
 """
 
 demo = gr.Interface(
@@ -241,8 +258,8 @@ demo = gr.Interface(
         gr.inputs.Image(type="filepath", label="Input"),
         gr.inputs.Checkbox(default=True, label="Background_Enhance"),
         gr.inputs.Checkbox(default=True, label="Face_Upsample"),
-        gr.inputs.Number(default=2, label="Rescaling_Factor"),
-        gr.Slider(0, 1, value=0.5, step=0.01, label='Codeformer_Fidelity: 0 for better quality, 1 for better identity')
+        gr.inputs.Number(default=2, label="Rescaling_Factor (up to 4)"),
+        gr.Slider(0, 1, value=0.5, step=0.01, label='Codeformer_Fidelity (0 for better quality, 1 for better identity)')
     ], [
         gr.outputs.Image(type="numpy", label="Output"),
         gr.outputs.File(label="Download the output")
@@ -257,7 +274,7 @@ demo = gr.Interface(
         ['04.jpg', True, True, 2, 0.1],
         ['05.jpg', True, True, 2, 0.1]
       ]
-    ).launch()
+    )
 
-demo.queue(concurrency_count=4)
+demo.queue(concurrency_count=2)
 demo.launch()
