@@ -114,12 +114,12 @@ def inference(image, background_enhance, face_upsample, upscale, codeformer_fide
         img = cv2.imread(str(image), cv2.IMREAD_COLOR)
         print('\timage size:', img.shape)
 
-        upscale = int(upscale) # covert type to int
-        if upscale > 4: # avoid momory exceeded due to too large upscale
+        upscale = int(upscale) # convert type to int
+        if upscale > 4: # avoid memory exceeded due to too large upscale
             upscale = 4 
-        if upscale > 2 and max(img.shape[:2])>1000: # avoid momory exceeded due to too large img resolution
+        if upscale > 2 and max(img.shape[:2])>1000: # avoid memory exceeded due to too large img resolution
             upscale = 2 
-        if max(img.shape[:2]) > 1500: # avoid momory exceeded due to too large img resolution
+        if max(img.shape[:2]) > 1500: # avoid memory exceeded due to too large img resolution
             upscale = 1
             background_enhance = False
             face_upsample = False
@@ -250,7 +250,7 @@ If you have any questions, please feel free to reach me out at <b>shangchenzhou@
     <a href="https://github.com/sczhou"><img style="margin-top:0.5em; margin-bottom:2em" src="https://img.shields.io/github/followers/sczhou?style=social" alt="Github Follow"></a>
 </div>
 
-<center><img src='https://visitor-badge.laobi.icu/badge?page_id=sczhou/CodeFormer' alt='visitors'></center>
+<center><img src='https://visitor-badge-sczhou.glitch.me/badge?page_id=sczhou/CodeFormer' alt='visitors'></center>
 """
 
 demo = gr.Interface(
