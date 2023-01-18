@@ -107,6 +107,9 @@ if __name__ == '__main__':
         result_root = args.output_path
 
     test_img_num = len(input_img_list)
+    if test_img_num == 0:
+        raise FileNotFoundError("\nInput file is not found.")
+
     # ------------------ set up background upsampler ------------------
     if args.bg_upsampler == 'realesrgan':
         bg_upsampler = set_realesrgan()

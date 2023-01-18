@@ -15,4 +15,3 @@ tqdm
 yapf
 lpips
 gdown # supports downloading the large file from Google Drive
-ffmpeg-python

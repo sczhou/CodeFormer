@@ -100,7 +100,7 @@ You can put the testing images in the `inputs/TestWhole` folder. If you would li
 🧑🏻 Face Restoration (cropped and aligned face)
 ```
 # For cropped and aligned faces
-python inference_codeformer.py -w 0.5 --has_aligned --input_path [input folder]
+python inference_codeformer.py -w 0.5 --has_aligned --input_path [image folder]|[image path]
 ```
 
 :framed_picture: Whole Image Enhancement
@@ -108,12 +108,17 @@ python inference_codeformer.py -w 0.5 --has_aligned --input_path [input folder]
 # For whole image
 # Add '--bg_upsampler realesrgan' to enhance the background regions with Real-ESRGAN
 # Add '--face_upsample' to further upsample restorated face with Real-ESRGAN
-python inference_codeformer.py -w 0.7 --input_path [image folder/image path]
+python inference_codeformer.py -w 0.7 --input_path [image folder]|[image path]
 ```
 
 :clapper: Video Enhancement
 ```
+# For Windows/Mac users, please install ffmpeg first
+conda install -c conda-forge ffmpeg
+```
+```
 # For video clips
+# video path should end with '.mp4'|'.mov'|'.avi'
 python inference_codeformer.py --bg_upsampler realesrgan --face_upsample -w 1.0 --input_path [video path]
 ```
 

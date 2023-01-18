@@ -30,10 +30,16 @@ class VideoReader:
     def __init__(self, video_path):
         self.paths = []  # for image&folder type
         self.audio = None
-        self.stream_reader = (
-            ffmpeg.input(video_path).output('pipe:', format='rawvideo', pix_fmt='bgr24',
-                                            loglevel='error').run_async(
-                                                pipe_stdin=True, pipe_stdout=True, cmd='ffmpeg'))
+        try:
+            self.stream_reader = (
+                ffmpeg.input(video_path).output('pipe:', format='rawvideo', pix_fmt='bgr24',
+                                                loglevel='error').run_async(
+                                                    pipe_stdin=True, pipe_stdout=True, cmd='ffmpeg'))
+        except FileNotFoundError:
+            print('Please install ffmpeg (not ffmpeg-python) by running\n',
+                  '\t$ conda install -c conda-forge ffmpeg')
+            sys.exit(0)
+
         meta = get_video_meta_info(video_path)
         self.width = meta['width']
         self.height = meta['height']
