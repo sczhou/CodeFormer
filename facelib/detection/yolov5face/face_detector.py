@@ -1,13 +1,10 @@
-import copy
-import os
-from pathlib import Path
-
 import cv2
-import numpy as np
+import copy
+import re
 import torch
-from torch import nn
+import numpy as np
 
-from facelib.detection.yolov5face.models.common import Conv
+from pathlib import Path
 from facelib.detection.yolov5face.models.yolo import Model
 from facelib.detection.yolov5face.utils.datasets import letterbox
 from facelib.detection.yolov5face.utils.general import (
@@ -17,7 +14,9 @@ from facelib.detection.yolov5face.utils.general import (
     scale_coords_landmarks,
 )
 
-IS_HIGH_VERSION = tuple(map(int, torch.__version__.split('+')[0].split('.')[:2])) >= (1, 9, 0)
+# IS_HIGH_VERSION = tuple(map(int, torch.__version__.split('+')[0].split('.')[:2])) >= (1, 9)
+IS_HIGH_VERSION = [int(m) for m in list(re.findall(r"^([0-9]+)\.([0-9]+)\.([0-9]+)([^0-9][a-zA-Z0-9]*)?(\+git.*)?$",\
+    torch.__version__)[0][:3])] >= [1, 9, 0]
 
 
 def isListempty(inList):

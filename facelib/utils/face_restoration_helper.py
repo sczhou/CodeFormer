@@ -7,6 +7,7 @@ from torchvision.transforms.functional import normalize
 from facelib.detection import init_detection_model
 from facelib.parsing import init_parsing_model
 from facelib.utils.misc import img2tensor, imwrite, is_gray, bgr2gray
+from basicsr.utils.misc import get_device
 
 
 def get_largest_face(det_faces, h, w):
@@ -97,7 +98,8 @@ class FaceRestoreHelper(object):
         self.pad_input_imgs = []
 
         if device is None:
-            self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+            # self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+            self.device = get_device()
         else:
             self.device = device
 

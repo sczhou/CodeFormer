@@ -13,14 +13,15 @@ import gradio as gr
 
 from torchvision.transforms.functional import normalize
 
+from basicsr.archs.rrdbnet_arch import RRDBNet
 from basicsr.utils import imwrite, img2tensor, tensor2img
 from basicsr.utils.download_util import load_file_from_url
+from basicsr.utils.misc import gpu_is_available, get_device
+from basicsr.utils.realesrgan_utils import RealESRGANer
+from basicsr.utils.registry import ARCH_REGISTRY
+
 from facelib.utils.face_restoration_helper import FaceRestoreHelper
 from facelib.utils.misc import is_gray
-from basicsr.archs.rrdbnet_arch import RRDBNet
-from basicsr.utils.realesrgan_utils import RealESRGANer
-
-from basicsr.utils.registry import ARCH_REGISTRY
 
 
 os.system("pip freeze")
@@ -65,7 +66,8 @@ def imread(img_path):
 
 # set enhancer with RealESRGAN
 def set_realesrgan():
-    half = True if torch.cuda.is_available() else False
+    # half = True if torch.cuda.is_available() else False
+    half = True if gpu_is_available() else False
     model = RRDBNet(
         num_in_ch=3,
         num_out_ch=3,
@@ -86,7 +88,8 @@ def set_realesrgan():
     return upsampler
 
 upsampler = set_realesrgan()
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = get_device()
 codeformer_net = ARCH_REGISTRY.get("CodeFormer")(
     dim_embd=512,
     codebook_size=1024,

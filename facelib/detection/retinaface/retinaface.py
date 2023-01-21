@@ -11,11 +11,13 @@ from facelib.detection.retinaface.retinaface_net import FPN, SSH, MobileNetV1, m
 from facelib.detection.retinaface.retinaface_utils import (PriorBox, batched_decode, batched_decode_landm, decode, decode_landm,
                                                  py_cpu_nms)
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+from basicsr.utils.misc import get_device
+# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = get_device()
 
 
 def generate_config(network_name):
-
+    
     cfg_mnet = {
         'name': 'mobilenet0.25',
         'min_sizes': [[16, 32], [64, 128], [256, 512]],

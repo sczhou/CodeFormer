@@ -6,9 +6,9 @@ import torch
 from torchvision.transforms.functional import normalize
 from basicsr.utils import imwrite, img2tensor, tensor2img
 from basicsr.utils.download_util import load_file_from_url
+from basicsr.utils.misc import gpu_is_available, get_device
 from facelib.utils.face_restoration_helper import FaceRestoreHelper
 from facelib.utils.misc import is_gray
-import torch.nn.functional as F
 
 from basicsr.utils.registry import ARCH_REGISTRY
 
@@ -19,9 +19,7 @@ pretrain_model_url = {
 def set_realesrgan():
     from basicsr.archs.rrdbnet_arch import RRDBNet
     from basicsr.utils.realesrgan_utils import RealESRGANer
-
-    cuda_is_available = torch.cuda.is_available()
-    half = True if cuda_is_available else False
+    
     model = RRDBNet(
         num_in_ch=3,
         num_out_ch=3,
@@ -37,10 +35,10 @@ def set_realesrgan():
         tile=args.bg_tile,
         tile_pad=40,
         pre_pad=0,
-        half=half, # need to set False in CPU mode
+        half=torch.cuda.is_available(), # need to set False in CPU/MPS mode
     )
 
-    if not cuda_is_available:  # CPU
+    if not gpu_is_available():  # CPU
         import warnings
         warnings.warn('Running on CPU now! Make sure your PyTorch version matches your CUDA.'
                         'The unoptimized RealESRGAN is slow on CPU. '
@@ -49,7 +47,8 @@ def set_realesrgan():
     return upsampler
 
 if __name__ == '__main__':
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = get_device()
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-i', '--input_path', type=str, default='./inputs/whole_imgs', 
@@ -79,10 +78,10 @@ if __name__ == '__main__':
     # ------------------------ input & output ------------------------
     w = args.fidelity_weight
     input_video = False
-    if args.input_path.endswith(('jpg', 'png')): # input single img path
+    if args.input_path.endswith(('jpg', 'jpeg', 'png', 'JPG', 'JPEG', 'PNG')): # input single img path
         input_img_list = [args.input_path]
         result_root = f'results/test_img_{w}'
-    elif args.input_path.endswith(('mp4', 'mov', 'avi')): # input video path
+    elif args.input_path.endswith(('mp4', 'mov', 'avi', 'MP4', 'MOV', 'AVI')): # input video path
         from basicsr.utils.video_util import VideoReader, VideoWriter
         input_img_list = []
         vidreader = VideoReader(args.input_path)
@@ -100,7 +99,7 @@ if __name__ == '__main__':
         if args.input_path.endswith('/'):  # solve when path ends with /
             args.input_path = args.input_path[:-1]
         # scan all the jpg and png images
-        input_img_list = sorted(glob.glob(os.path.join(args.input_path, '*.[jp][pn]g')))
+        input_img_list = sorted(glob.glob(os.path.join(args.input_path, '*.[jpJP][pnPN]*[gG]')))
         result_root = f'results/{os.path.basename(args.input_path)}_{w}'
 
     if not args.output_path is None: # set output path

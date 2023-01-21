@@ -6,8 +6,8 @@ import os
 import subprocess
 import sys
 import time
-import torch
 from torch.utils.cpp_extension import BuildExtension, CppExtension, CUDAExtension
+from utils.misc import gpu_is_available
 
 version_file = './basicsr/version.py'
 
@@ -87,7 +87,8 @@ def make_cuda_ext(name, module, sources, sources_cuda=None):
     define_macros = []
     extra_compile_args = {'cxx': []}
 
-    if torch.cuda.is_available() or os.getenv('FORCE_CUDA', '0') == '1':
+    # if torch.cuda.is_available() or os.getenv('FORCE_CUDA', '0') == '1':
+    if gpu_is_available or os.getenv('FORCE_CUDA', '0') == '1':
         define_macros += [('WITH_CUDA', None)]
         extension = CUDAExtension
         extra_compile_args['nvcc'] = [

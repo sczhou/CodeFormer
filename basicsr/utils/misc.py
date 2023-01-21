@@ -1,12 +1,35 @@
-import numpy as np
 import os
+import re
 import random
 import time
 import torch
+import numpy as np
 from os import path as osp
 
 from .dist_util import master_only
 from .logger import get_root_logger
+
+IS_HIGH_VERSION = [int(m) for m in list(re.findall(r"^([0-9]+)\.([0-9]+)\.([0-9]+)([^0-9][a-zA-Z0-9]*)?(\+git.*)?$",\
+    torch.__version__)[0][:3])] >= [1, 12, 0]
+
+def gpu_is_available():
+    if IS_HIGH_VERSION:
+        if torch.backends.mps.is_available():
+            return True
+    return True if torch.cuda.is_available() and torch.backends.cudnn.is_available() else False
+
+def get_device(gpu_id=None):
+    if gpu_id is None:
+        gpu_str = ''
+    elif isinstance(gpu_id, int):
+        gpu_str = f':{gpu_id}'
+    else:
+        raise TypeError('Input should be int value.')
+
+    if IS_HIGH_VERSION:
+        if torch.backends.mps.is_available():
+            return torch.device('mps'+gpu_str)
+    return torch.device('cuda'+gpu_str if torch.cuda.is_available() and torch.backends.cudnn.is_available() else 'cpu')
 
 
 def set_random_seed(seed):

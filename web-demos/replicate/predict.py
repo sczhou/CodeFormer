@@ -14,12 +14,13 @@ try:
 except Exception:
     print('please install cog package')
 
-from basicsr.utils import imwrite, img2tensor, tensor2img
 from basicsr.archs.rrdbnet_arch import RRDBNet
+from basicsr.utils import imwrite, img2tensor, tensor2img
 from basicsr.utils.realesrgan_utils import RealESRGANer
+from basicsr.utils.misc import gpu_is_available
 from basicsr.utils.registry import ARCH_REGISTRY
-from facelib.utils.face_restoration_helper import FaceRestoreHelper
 
+from facelib.utils.face_restoration_helper import FaceRestoreHelper
 
 class Predictor(BasePredictor):
     def setup(self):
@@ -159,7 +160,8 @@ def imread(img_path):
 
 
 def set_realesrgan():
-    if not torch.cuda.is_available():  # CPU
+    # if not torch.cuda.is_available():  # CPU
+    if not gpu_is_available():  # CPU
         import warnings
 
         warnings.warn(
