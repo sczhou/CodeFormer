@@ -172,3 +172,31 @@ def bgr2gray(img, out_channel=3):
     if out_channel == 3:
         gray = gray[:,:,np.newaxis].repeat(3, axis=2)
     return gray
+
+
+def calc_mean_std(feat, eps=1e-5):
+    """
+    Args:
+        feat (numpy): 3D [w h c]s
+    """
+    size = feat.shape
+    assert len(size) == 3, 'The input feature should be 3D tensor.'
+    c = size[2]
+    feat_var = feat.reshape(-1, c).var(axis=0) + eps
+    feat_std = np.sqrt(feat_var).reshape(1, 1, c)
+    feat_mean = feat.reshape(-1, c).mean(axis=0).reshape(1, 1, c)
+    return feat_mean, feat_std
+
+
+def adain_npy(content_feat, style_feat):
+    """Adaptive instance normalization for numpy.
+
+    Args:
+        content_feat (numpy): The input feature.
+        style_feat (numpy): The reference feature.
+    """
+    size = content_feat.shape
+    style_mean, style_std = calc_mean_std(style_feat)
+    content_mean, content_std = calc_mean_std(content_feat)
+    normalized_feat = (content_feat - np.broadcast_to(content_mean, size)) / np.broadcast_to(content_std, size)
+    return normalized_feat * np.broadcast_to(style_std, size) + np.broadcast_to(style_mean, size)

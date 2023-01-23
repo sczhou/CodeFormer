@@ -205,7 +205,7 @@ if __name__ == '__main__':
                 restored_face = tensor2img(cropped_face_t, rgb2bgr=True, min_max=(-1, 1))
 
             restored_face = restored_face.astype('uint8')
-            face_helper.add_restored_face(restored_face)
+            face_helper.add_restored_face(restored_face, cropped_face)
 
         # paste_back
         if not args.has_aligned:
