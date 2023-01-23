@@ -174,7 +174,7 @@ if __name__ == '__main__':
         if args.has_aligned: 
             # the input faces are already cropped and aligned
             img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_LINEAR)
-            face_helper.is_gray = is_gray(img, threshold=5)
+            face_helper.is_gray = is_gray(img, threshold=10)
             if face_helper.is_gray:
                 print('Grayscale input: True')
             face_helper.cropped_faces = [img]
