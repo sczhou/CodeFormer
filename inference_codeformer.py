@@ -19,7 +19,13 @@ pretrain_model_url = {
 def set_realesrgan():
     from basicsr.archs.rrdbnet_arch import RRDBNet
     from basicsr.utils.realesrgan_utils import RealESRGANer
-    
+
+    use_half = False
+    if torch.cuda.is_available(): # set False in CPU/MPS mode
+        no_half_gpu_list = ['1650', '1660'] # set False for GPUs that don't support f16
+        if not True in [gpu in torch.cuda.get_device_name(0) for gpu in no_half_gpu_list]:
+            use_half = True
+
     model = RRDBNet(
         num_in_ch=3,
         num_out_ch=3,
@@ -35,7 +41,7 @@ def set_realesrgan():
         tile=args.bg_tile,
         tile_pad=40,
         pre_pad=0,
-        half=torch.cuda.is_available(), # need to set False in CPU/MPS mode
+        half=use_half
     )
 
     if not gpu_is_available():  # CPU
