@@ -123,11 +123,10 @@ if __name__ == '__main__':
 
     # ------------------ set up face upsampler ------------------
     if args.face_upsample:
-        face_upsampler = None
-        # if bg_upsampler is not None:
-        #     face_upsampler = bg_upsampler
-        # else:
-        #     face_upsampler = set_realesrgan()
+        if bg_upsampler is not None:
+            face_upsampler = bg_upsampler
+        else:
+            face_upsampler = set_realesrgan()
     else:
         face_upsampler = None
 
