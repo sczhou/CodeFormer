@@ -19,7 +19,7 @@ if __name__ == '__main__':
     parser.add_argument(
         'method',
         type=str,
-        help=("Options: 'CodeFormer' 'facelib'. Set to 'all' to download all the models."))
+        help=("Options: 'CodeFormer' 'facelib' 'dlib'. Set to 'all' to download all the models."))
     args = parser.parse_args()
 
     file_urls = {
@@ -30,6 +30,10 @@ if __name__ == '__main__':
             # 'yolov5l-face.pth': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/yolov5l-face.pth',
             'detection_Resnet50_Final.pth': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/detection_Resnet50_Final.pth',
             'parsing_parsenet.pth': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/parsing_parsenet.pth'
+        },
+        'dlib': {
+            'mmod_human_face_detector-4cb19393.dat': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/mmod_human_face_detector-4cb19393.dat',
+            'shape_predictor_5_face_landmarks-c4b1e980.dat': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/shape_predictor_5_face_landmarks-c4b1e980.dat'
         }
     }
 

@@ -7,8 +7,13 @@ from torchvision.transforms.functional import normalize
 from facelib.detection import init_detection_model
 from facelib.parsing import init_parsing_model
 from facelib.utils.misc import img2tensor, imwrite, is_gray, bgr2gray, adain_npy
+from basicsr.utils.download_util import load_file_from_url
 from basicsr.utils.misc import get_device
 
+dlib_model_url = {
+    'face_detector': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/mmod_human_face_detector-4cb19393.dat',
+    'shape_predictor_5': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/shape_predictor_5_face_landmarks-c4b1e980.dat'
+}
 
 def get_largest_face(det_faces, h, w):
 
@@ -65,8 +70,15 @@ class FaceRestoreHelper(object):
         self.crop_ratio = crop_ratio  # (h, w)
         assert (self.crop_ratio[0] >= 1 and self.crop_ratio[1] >= 1), 'crop ration only supports >=1'
         self.face_size = (int(face_size * self.crop_ratio[1]), int(face_size * self.crop_ratio[0]))
+        self.det_model = det_model
 
-        if self.template_3points:
+        if self.det_model == 'dlib':
+            # standard 5 landmarks for FFHQ faces with 1024 x 1024
+            self.face_template = np.array([[686.77227723, 488.62376238], [586.77227723, 493.59405941],
+                                        [337.91089109, 488.38613861], [437.95049505, 493.51485149],
+                                        [513.58415842, 678.5049505]])
+            self.face_template = self.face_template / (1024 // face_size)
+        elif self.template_3points:
             self.face_template = np.array([[192, 240], [319, 240], [257, 371]])
         else:
             # standard 5 landmarks for FFHQ faces with 512 x 512 
@@ -77,7 +89,6 @@ class FaceRestoreHelper(object):
             # dlib: left_eye: 36:41  right_eye: 42:47  nose: 30,32,33,34  left mouth corner: 48  right mouth corner: 54
             # self.face_template = np.array([[193.65928, 242.98541], [318.32558, 243.06108], [255.67984, 328.82894],
             #                                 [198.22603, 372.82502], [313.91018, 372.75659]])
-
 
         self.face_template = self.face_template * (face_size / 512.0)
         if self.crop_ratio[0] > 1:
@@ -104,7 +115,10 @@ class FaceRestoreHelper(object):
             self.device = device
 
         # init face detection model
-        self.face_det = init_detection_model(det_model, half=False, device=self.device)
+        if self.det_model == 'dlib':
+            self.face_detector, self.shape_predictor_5 = self.init_dlib(dlib_model_url['face_detector'], dlib_model_url['shape_predictor_5'])
+        else:
+            self.face_detector = init_detection_model(det_model, half=False, device=self.device)
 
         # init face parsing model
         self.use_parse = use_parse
@@ -135,12 +149,59 @@ class FaceRestoreHelper(object):
             f = 512.0/min(self.input_img.shape[:2])
             self.input_img = cv2.resize(self.input_img, (0,0), fx=f, fy=f, interpolation=cv2.INTER_LINEAR)
 
+    def init_dlib(self, detection_path, landmark5_path):
+        """Initialize the dlib detectors and predictors."""
+        try:
+            import dlib
+        except ImportError:
+            print('Please install dlib by running:' 'conda install -c conda-forge dlib')
+        detection_path = load_file_from_url(url=detection_path, model_dir='weights/dlib', progress=True, file_name=None)
+        landmark5_path = load_file_from_url(url=landmark5_path, model_dir='weights/dlib', progress=True, file_name=None)
+        face_detector = dlib.cnn_face_detection_model_v1(detection_path)
+        shape_predictor_5 = dlib.shape_predictor(landmark5_path)
+        return face_detector, shape_predictor_5
+
+    def get_face_landmarks_5_dlib(self,
+                                only_keep_largest=False,
+                                scale=1):
+        det_faces = self.face_detector(self.input_img, scale)
+
+        if len(det_faces) == 0:
+            print('No face detected. Try to increase upsample_num_times.')
+            return 0
+        else:
+            if only_keep_largest:
+                print('Detect several faces and only keep the largest.')
+                face_areas = []
+                for i in range(len(det_faces)):
+                    face_area = (det_faces[i].rect.right() - det_faces[i].rect.left()) * (
+                        det_faces[i].rect.bottom() - det_faces[i].rect.top())
+                    face_areas.append(face_area)
+                largest_idx = face_areas.index(max(face_areas))
+                self.det_faces = [det_faces[largest_idx]]
+            else:
+                self.det_faces = det_faces
+
+        if len(self.det_faces) == 0:
+            return 0
+
+        for face in self.det_faces:
+            shape = self.shape_predictor_5(self.input_img, face.rect)
+            landmark = np.array([[part.x, part.y] for part in shape.parts()])
+            self.all_landmarks_5.append(landmark)
+
+        return len(self.all_landmarks_5)
+
+
     def get_face_landmarks_5(self,
                              only_keep_largest=False,
                              only_center_face=False,
                              resize=None,
                              blur_ratio=0.01,
                              eye_dist_threshold=None):
+        if self.det_model == 'dlib':
+            return self.get_face_landmarks_5_dlib(only_keep_largest)
+
         if resize is None:
             scale = 1
             input_img = self.input_img
@@ -153,7 +214,7 @@ class FaceRestoreHelper(object):
             input_img = cv2.resize(self.input_img, (w, h), interpolation=interp)
 
         with torch.no_grad():
-            bboxes = self.face_det.detect_faces(input_img)
+            bboxes = self.face_detector.detect_faces(input_img)
 
         if bboxes is None or bboxes.shape[0] == 0:
             return 0

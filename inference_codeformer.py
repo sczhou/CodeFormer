@@ -71,7 +71,7 @@ if __name__ == '__main__':
     # large det_model: 'YOLOv5l', 'retinaface_resnet50'
     # small det_model: 'YOLOv5n', 'retinaface_mobile0.25'
     parser.add_argument('--detection_model', type=str, default='retinaface_resnet50', 
-            help='Face detector. Optional: retinaface_resnet50, retinaface_mobile0.25, YOLOv5l, YOLOv5n. \
+            help='Face detector. Optional: retinaface_resnet50, retinaface_mobile0.25, YOLOv5l, YOLOv5n, dlib. \
                 Default: retinaface_resnet50')
     parser.add_argument('--bg_upsampler', type=str, default='None', help='Background upsampler. Optional: realesrgan')
     parser.add_argument('--face_upsample', action='store_true', help='Face upsampler after enhancement. Default: False')
@@ -113,7 +113,8 @@ if __name__ == '__main__':
 
     test_img_num = len(input_img_list)
     if test_img_num == 0:
-        raise FileNotFoundError("\nInput file is not found.")
+        raise FileNotFoundError('No input image/video is found...\n' 
+            '\tNote that --input_path for video should end with .mp4|.mov|.avi')
 
     # ------------------ set up background upsampler ------------------
     if args.bg_upsampler == 'realesrgan':

@@ -20,8 +20,9 @@ S-Lab, Nanyang Technological University
 
 :star: If CodeFormer is helpful to your images or projects, please help star this repo. Thanks! :hugs: 
 
-**[<font color=#d1585d>News</font>]**: :whale: *Due to copyright issues, we have to delay the release of the training code (expected by the end of this year). Please star and stay tuned for our future updates!* 
+**[<font color=#d1585d>News</font>]**: :whale: *We regret to inform you that the release of our code will be postponed from its earlier plan. Nevertheless, we assure you that it will be made available **by the end of this April**. Thank you for your understanding and patience. Our apologies for any inconvenience this may cause.* 
 ### Update
+- **2023.02.10**: Include `dlib` as a new face detector option, it produces more accurate face identity.
 - **2022.10.05**: Support video input `--input_path [YOUR_VIDOE.mp4]`. Try it to enhance your videos! :clapper: 
 - **2022.09.14**: Integrated to :hugs: [Hugging Face](https://huggingface.co/spaces). Try out online demo! [![Hugging Face](https://img.shields.io/badge/Demo-%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/spaces/sczhou/CodeFormer)
 - **2022.09.09**: Integrated to :rocket: [Replicate](https://replicate.com/explore). Try out online demo! [![Replicate](https://img.shields.io/badge/Demo-%F0%9F%9A%80%20Replicate-blue)](https://replicate.com/sczhou/codeformer)
@@ -74,15 +75,17 @@ conda activate codeformer
 # install python dependencies
 pip3 install -r requirements.txt
 python basicsr/setup.py develop
+conda install -c conda-forge dlib (only for dlib face detector)
 ```
 <!-- conda install -c conda-forge dlib -->
 
 ### Quick Inference
 
 #### Download Pre-trained Models:
-Download the facelib pretrained models from [[Google Drive](https://drive.google.com/drive/folders/1b_3qwrzY_kTQh0-SnBoGBgOrJ_PLZSKm?usp=sharing) | [OneDrive](https://entuedu-my.sharepoint.com/:f:/g/personal/s200094_e_ntu_edu_sg/EvDxR7FcAbZMp_MA9ouq7aQB8XTppMb3-T0uGZ_2anI2mg?e=DXsJFo)] to the `weights/facelib` folder. You can manually download the pretrained models OR download by running the following command.
+Download the facelib and dlib pretrained models from [[Google Drive](https://drive.google.com/drive/folders/1b_3qwrzY_kTQh0-SnBoGBgOrJ_PLZSKm?usp=sharing) | [OneDrive](https://entuedu-my.sharepoint.com/:f:/g/personal/s200094_e_ntu_edu_sg/EvDxR7FcAbZMp_MA9ouq7aQB8XTppMb3-T0uGZ_2anI2mg?e=DXsJFo)] to the `weights/facelib` folder. You can manually download the pretrained models OR download by running the following command.
 ```
 python scripts/download_pretrained_models.py facelib
+python scripts/download_pretrained_models.py dlib (only for dlib face detector)
 ```
 
 Download the CodeFormer pretrained models from [[Google Drive](https://drive.google.com/drive/folders/1CNNByjHDFt0b95q54yMVp6Ifo5iuU6QS?usp=sharing) | [OneDrive](https://entuedu-my.sharepoint.com/:f:/g/personal/s200094_e_ntu_edu_sg/EoKFj4wo8cdIn2-TY2IV6CYBhZ0pIG4kUOeHdPR_A5nlbg?e=AO8UN9)] to the `weights/CodeFormer` folder. You can manually download the pretrained models OR download by running the following command.
