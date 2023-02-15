@@ -4,11 +4,34 @@ import os
 import torch
 from torchvision.transforms.functional import normalize
 
-from facelib.detection import init_detection_model
-from facelib.parsing import init_parsing_model
-from facelib.utils.misc import img2tensor, imwrite, is_gray, bgr2gray, adain_npy
+from ..detection import init_detection_model
+from ..parsing import init_parsing_model
+from .misc import img2tensor, imwrite, is_gray, bgr2gray, adain_npy
 from basicsr.utils.download_util import load_file_from_url
-from basicsr.utils.misc import get_device
+
+import re
+IS_HIGH_VERSION = [int(m) for m in list(re.findall(r"^([0-9]+)\.([0-9]+)\.([0-9]+)([^0-9][a-zA-Z0-9]*)?(\+git.*)?$",\
+    torch.__version__)[0][:3])] >= [1, 12, 0]
+
+def gpu_is_available():
+    if IS_HIGH_VERSION:
+        if torch.backends.mps.is_available():
+            return True
+    return True if torch.cuda.is_available() and torch.backends.cudnn.is_available() else False
+
+def get_device(gpu_id=None):
+    if gpu_id is None:
+        gpu_str = ''
+    elif isinstance(gpu_id, int):
+        gpu_str = f':{gpu_id}'
+    else:
+        raise TypeError('Input should be int value.')
+
+    if IS_HIGH_VERSION:
+        if torch.backends.mps.is_available():
+            return torch.device('mps'+gpu_str)
+    return torch.device('cuda'+gpu_str if torch.cuda.is_available() and torch.backends.cudnn.is_available() else 'cpu')
+
 
 dlib_model_url = {
     'face_detector': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/mmod_human_face_detector-4cb19393.dat',

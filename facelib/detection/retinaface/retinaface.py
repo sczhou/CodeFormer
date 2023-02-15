@@ -6,12 +6,34 @@ import torch.nn.functional as F
 from PIL import Image
 from torchvision.models._utils import IntermediateLayerGetter as IntermediateLayerGetter
 
-from facelib.detection.align_trans import get_reference_facial_points, warp_and_crop_face
-from facelib.detection.retinaface.retinaface_net import FPN, SSH, MobileNetV1, make_bbox_head, make_class_head, make_landmark_head
-from facelib.detection.retinaface.retinaface_utils import (PriorBox, batched_decode, batched_decode_landm, decode, decode_landm,
+from ..align_trans import get_reference_facial_points, warp_and_crop_face
+from .retinaface_net import FPN, SSH, MobileNetV1, make_bbox_head, make_class_head, make_landmark_head
+from .retinaface_utils import (PriorBox, batched_decode, batched_decode_landm, decode, decode_landm,
                                                  py_cpu_nms)
 
-from basicsr.utils.misc import get_device
+import re
+IS_HIGH_VERSION = [int(m) for m in list(re.findall(r"^([0-9]+)\.([0-9]+)\.([0-9]+)([^0-9][a-zA-Z0-9]*)?(\+git.*)?$",\
+    torch.__version__)[0][:3])] >= [1, 12, 0]
+
+def gpu_is_available():
+    if IS_HIGH_VERSION:
+        if torch.backends.mps.is_available():
+            return True
+    return True if torch.cuda.is_available() and torch.backends.cudnn.is_available() else False
+
+def get_device(gpu_id=None):
+    if gpu_id is None:
+        gpu_str = ''
+    elif isinstance(gpu_id, int):
+        gpu_str = f':{gpu_id}'
+    else:
+        raise TypeError('Input should be int value.')
+
+    if IS_HIGH_VERSION:
+        if torch.backends.mps.is_available():
+            return torch.device('mps'+gpu_str)
+    return torch.device('cuda'+gpu_str if torch.cuda.is_available() and torch.backends.cudnn.is_available() else 'cpu')
+
 # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 device = get_device()
 

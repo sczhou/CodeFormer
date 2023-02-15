@@ -5,13 +5,13 @@ import glob
 import torch
 from torchvision.transforms.functional import normalize
 from basicsr.utils import imwrite, img2tensor, tensor2img
-from basicsr.utils.download_util import load_file_from_url
-from basicsr.utils.misc import gpu_is_available, get_device
-from facelib.utils.face_restoration_helper import FaceRestoreHelper
-from facelib.utils.misc import is_gray
+from .basicsr.utils.download_util import load_file_from_url
+from .basicsr.utils.misc import gpu_is_available, get_device
+from .facelib.utils.face_restoration_helper import FaceRestoreHelper
+from .facelib.utils.misc import is_gray
 import numpy as np
 
-from basicsr.utils.registry import ARCH_REGISTRY
+from .basicsr.utils.registry import ARCH_REGISTRY
 from PIL import Image
 import sys
 import pdb
@@ -21,8 +21,8 @@ pretrain_model_url = {
 }
 
 def set_realesrgan(bg_tile):
-    from basicsr.archs.rrdbnet_arch import RRDBNet
-    from basicsr.utils.realesrgan_utils import RealESRGANer
+    from .basicsr.archs.rrdbnet_arch import RRDBNet
+    from .basicsr.utils.realesrgan_utils import RealESRGANer
 
     use_half = False
     if torch.cuda.is_available(): # set False in CPU/MPS mode
