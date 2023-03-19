@@ -1,5 +1,6 @@
 addict
 future
+gradio
 lmdb
 numpy
 opencv-python
