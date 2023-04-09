@@ -22,22 +22,17 @@ S-Lab, Nanyang Technological University
 
 **[<font color=#d1585d>News</font>]**: :whale: *We regret to inform you that the release of our code will be postponed from its earlier plan. Nevertheless, we assure you that it will be made available **by the end of this April**. Thank you for your understanding and patience. Our apologies for any inconvenience this may cause.* 
 ### Update
+- **2023.04.09**: Add features of inpainting and colorization for cropped and aligned face images.
 - **2023.02.10**: Include `dlib` as a new face detector option, it produces more accurate face identity.
-- **2022.10.05**: Support video input `--input_path [YOUR_VIDOE.mp4]`. Try it to enhance your videos! :clapper: 
+- **2022.10.05**: Support video input `--input_path [YOUR_VIDEO.mp4]`. Try it to enhance your videos! :clapper: 
 - **2022.09.14**: Integrated to :hugs: [Hugging Face](https://huggingface.co/spaces). Try out online demo! [![Hugging Face](https://img.shields.io/badge/Demo-%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/spaces/sczhou/CodeFormer)
 - **2022.09.09**: Integrated to :rocket: [Replicate](https://replicate.com/explore). Try out online demo! [![Replicate](https://img.shields.io/badge/Demo-%F0%9F%9A%80%20Replicate-blue)](https://replicate.com/sczhou/codeformer)
-- **2022.09.04**: Add face upsampling `--face_upsample` for high-resolution AI-created face enhancement.
-- **2022.08.23**: Some modifications on face detection and fusion for better AI-created face enhancement.
-- **2022.08.07**: Integrate [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) to support background image enhancement.
-- **2022.07.29**: Integrate new face detectors of `['RetinaFace'(default), 'YOLOv5']`. 
-- **2022.07.17**: Add Colab demo of CodeFormer. <a href="https://colab.research.google.com/drive/1m52PNveE4PBhYrecj34cnpEeiHcC5LTb?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="google colab logo"></a>
-- **2022.07.16**: Release inference code for face restoration. :blush:
-- **2022.06.21**: This repo is created.
+- [**More**](docs/history_changelog.md)
 
 ### TODO
-- [ ] Add checkpoint for face inpainting
-- [ ] Add checkpoint for face colorization
 - [ ] Add training code and config files
+- [x] Add checkpoint and script for face inpainting
+- [x] Add checkpoint and script for face colorization
 - [x] ~~Add background image enhancement~~
 
 #### :panda_face: Try Enhancing Old Photos / Fixing AI-arts
@@ -75,34 +70,41 @@ conda activate codeformer
 # install python dependencies
 pip3 install -r requirements.txt
 python basicsr/setup.py develop
-conda install -c conda-forge dlib (only for dlib face detector)
+conda install -c conda-forge dlib (only for face detection or cropping with dlib)
 ```
 <!-- conda install -c conda-forge dlib -->
 
 ### Quick Inference
 
 #### Download Pre-trained Models:
-Download the facelib and dlib pretrained models from [[Google Drive](https://drive.google.com/drive/folders/1b_3qwrzY_kTQh0-SnBoGBgOrJ_PLZSKm?usp=sharing) | [OneDrive](https://entuedu-my.sharepoint.com/:f:/g/personal/s200094_e_ntu_edu_sg/EvDxR7FcAbZMp_MA9ouq7aQB8XTppMb3-T0uGZ_2anI2mg?e=DXsJFo)] to the `weights/facelib` folder. You can manually download the pretrained models OR download by running the following command.
+Download the facelib and dlib pretrained models from [[Releases](https://github.com/sczhou/CodeFormer/releases) | [Google Drive](https://drive.google.com/drive/folders/1b_3qwrzY_kTQh0-SnBoGBgOrJ_PLZSKm?usp=sharing) | [OneDrive](https://entuedu-my.sharepoint.com/:f:/g/personal/s200094_e_ntu_edu_sg/EvDxR7FcAbZMp_MA9ouq7aQB8XTppMb3-T0uGZ_2anI2mg?e=DXsJFo)] to the `weights/facelib` folder. You can manually download the pretrained models OR download by running the following command:
 ```
 python scripts/download_pretrained_models.py facelib
 python scripts/download_pretrained_models.py dlib (only for dlib face detector)
 ```
 
-Download the CodeFormer pretrained models from [[Google Drive](https://drive.google.com/drive/folders/1CNNByjHDFt0b95q54yMVp6Ifo5iuU6QS?usp=sharing) | [OneDrive](https://entuedu-my.sharepoint.com/:f:/g/personal/s200094_e_ntu_edu_sg/EoKFj4wo8cdIn2-TY2IV6CYBhZ0pIG4kUOeHdPR_A5nlbg?e=AO8UN9)] to the `weights/CodeFormer` folder. You can manually download the pretrained models OR download by running the following command.
+Download the CodeFormer pretrained models from [[Releases](https://github.com/sczhou/CodeFormer/releases) | [Google Drive](https://drive.google.com/drive/folders/1CNNByjHDFt0b95q54yMVp6Ifo5iuU6QS?usp=sharing) | [OneDrive](https://entuedu-my.sharepoint.com/:f:/g/personal/s200094_e_ntu_edu_sg/EoKFj4wo8cdIn2-TY2IV6CYBhZ0pIG4kUOeHdPR_A5nlbg?e=AO8UN9)] to the `weights/CodeFormer` folder. You can manually download the pretrained models OR download by running the following command:
 ```
 python scripts/download_pretrained_models.py CodeFormer
 ```
 
 #### Prepare Testing Data:
-You can put the testing images in the `inputs/TestWhole` folder. If you would like to test on cropped and aligned faces, you can put them in the `inputs/cropped_faces` folder.
+You can put the testing images in the `inputs/TestWhole` folder. If you would like to test on cropped and aligned faces, you can put them in the `inputs/cropped_faces` folder. You can get the cropped and aligned faces by running the following command:
+```
+# you may need to install dlib via: conda install -c conda-forge dlib
+python scripts/crop_align_face.py -i [input folder] -o [output folder]
+```
 
 
-#### Testing on Face Restoration:
+#### Testing:
 [Note] If you want to compare CodeFormer in your paper, please run the following command indicating `--has_aligned` (for cropped and aligned face), as the command for the whole image will involve a process of face-background fusion that may damage hair texture on the boundary, which leads to unfair comparison.
+
+Fidelity weight *w* lays in [0, 1]. Generally, smaller *w* tends to produce a higher-quality result, while larger *w* yields a higher-fidelity result. The results will be saved in the `results` folder.
+
 
 🧑🏻 Face Restoration (cropped and aligned face)
 ```
-# For cropped and aligned faces
+# For cropped and aligned faces (512x512)
 python inference_codeformer.py -w 0.5 --has_aligned --input_path [image folder]|[image path]
 ```
 
@@ -121,14 +123,25 @@ conda install -c conda-forge ffmpeg
 ```
 ```
 # For video clips
-# video path should end with '.mp4'|'.mov'|'.avi'
+# Video path should end with '.mp4'|'.mov'|'.avi'
 python inference_codeformer.py --bg_upsampler realesrgan --face_upsample -w 1.0 --input_path [video path]
 ```
 
+🌈 Face Colorization (cropped and aligned face)
+```
+# For cropped and aligned faces (512x512)
+# Colorize black and white or faded photo
+python inference_inpainting.py --input_path [image folder]|[image path]
+```
 
-Fidelity weight *w* lays in [0, 1]. Generally, smaller *w* tends to produce a higher-quality result, while larger *w* yields a higher-fidelity result. 
+🎨 Face Inpainting (cropped and aligned face)
+```
+# For cropped and aligned faces (512x512)
+# Inputs could be masked by white brush using a image editing app, e.g., Photoshop 
+# (check out the examples in inputs/masked_faces)
+python inference_colorization.py --input_path [image folder]|[image path]
+```
 
-The results will be saved in the `results` folder.
 
 ### Citation
 If our work is useful for your research, please consider citing:

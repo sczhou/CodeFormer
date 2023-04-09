@@ -13,19 +13,25 @@ requirements:
     # http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
 """
 
-import cv2
-import dlib
+import os
 import glob
 import numpy as np
-import os
 import PIL
 import PIL.Image
 import scipy
 import scipy.ndimage
-import sys
 import argparse
+from basicsr.utils.download_util import load_file_from_url
+
+try:
+    import dlib
+except ImportError:
+    print('Please install dlib by running:' 'conda install -c conda-forge dlib')
 
 # download model from: http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
+shape_predictor_url = 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/shape_predictor_68_face_landmarks-fbdc2cb8.dat'
+ckpt_path = load_file_from_url(url=shape_predictor_url, 
+                                    model_dir='weights/dlib', progress=True, file_name=None)
 predictor = dlib.shape_predictor('weights/dlib/shape_predictor_68_face_landmarks-fbdc2cb8.dat')
 
 
@@ -39,9 +45,9 @@ def get_landmark(filepath, only_keep_largest=True):
     dets = detector(img, 1)
 
     # Shangchen modified
-    print("Number of faces detected: {}".format(len(dets)))
+    print("\tNumber of faces detected: {}".format(len(dets)))
     if only_keep_largest:
-        print('Detect several faces and only keep the largest.')
+        print('\tOnly keep the largest.')
         face_areas = []
         for k, d in enumerate(dets):
             face_area = (d.right() - d.left()) * (d.bottom() - d.top())
@@ -50,16 +56,16 @@ def get_landmark(filepath, only_keep_largest=True):
         largest_idx = face_areas.index(max(face_areas))
         d = dets[largest_idx]
         shape = predictor(img, d)
-        print("Part 0: {}, Part 1: {} ...".format(
-            shape.part(0), shape.part(1)))
+        # print("Part 0: {}, Part 1: {} ...".format(
+        #     shape.part(0), shape.part(1)))
     else:
         for k, d in enumerate(dets):
-            print("Detection {}: Left: {} Top: {} Right: {} Bottom: {}".format(
-                k, d.left(), d.top(), d.right(), d.bottom()))
+            # print("Detection {}: Left: {} Top: {} Right: {} Bottom: {}".format(
+            #     k, d.left(), d.top(), d.right(), d.bottom()))
             # Get the landmarks/parts for the face in box d.
             shape = predictor(img, d)
-            print("Part 0: {}, Part 1: {} ...".format(
-                shape.part(0), shape.part(1)))
+            # print("Part 0: {}, Part 1: {} ...".format(
+            #     shape.part(0), shape.part(1)))
 
     t = list(shape.parts())
     a = []
@@ -171,7 +177,7 @@ def align_face(filepath, out_path):
         img = img.resize((output_size, output_size), PIL.Image.ANTIALIAS)
 
     # Save aligned image.
-    print('saveing: ', out_path)
+    # print('saveing: ', out_path)
     img.save(out_path)
 
     return img, np.max(quad[:, 0]) - np.min(quad[:, 0])
@@ -179,14 +185,21 @@ def align_face(filepath, out_path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--in_dir', type=str, default='./inputs/whole_imgs')
-    parser.add_argument('--out_dir', type=str, default='./inputs/cropped_faces')
+    parser.add_argument('-i', '--in_dir', type=str, default='./inputs/whole_imgs')
+    parser.add_argument('-o', '--out_dir', type=str, default='./inputs/cropped_faces')
     args = parser.parse_args()
 
-    img_list = sorted(glob.glob(f'{args.in_dir}/*.png'))
-    img_list = sorted(img_list)
+    if args.out_dir.endswith('/'):  # solve when path ends with /
+        args.out_dir = args.out_dir[:-1]
+    dir_name = os.path.abspath(args.out_dir)
+    os.makedirs(dir_name, exist_ok=True)
 
-    for in_path in img_list:
+    img_list = sorted(glob.glob(os.path.join(args.in_dir, '*.[jpJP][pnPN]*[gG]')))
+    test_img_num = len(img_list)
+
+    for i, in_path in enumerate(img_list):
+        img_name = os.path.basename(in_path)
+        print(f'[{i+1}/{test_img_num}] Processing: {img_name}')
         out_path = os.path.join(args.out_dir, in_path.split("/")[-1])        
         out_path = out_path.replace('.jpg', '.png')
         size_ = align_face(in_path, out_path)

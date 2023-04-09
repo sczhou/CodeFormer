@@ -67,10 +67,10 @@ class MessageLogger():
             message += f'{k}: {v:.4e} '
             # tensorboard logger
             if self.use_tb_logger:
-                if k.startswith('l_'):
-                    self.tb_logger.add_scalar(f'losses/{k}', v, current_iter)
-                else:
-                    self.tb_logger.add_scalar(k, v, current_iter)
+                # if k.startswith('l_'):
+                #     self.tb_logger.add_scalar(f'losses/{k}', v, current_iter)
+                # else:
+                self.tb_logger.add_scalar(k, v, current_iter)
         self.logger.info(message)
 
 
