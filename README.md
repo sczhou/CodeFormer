@@ -131,15 +131,15 @@ python inference_codeformer.py --bg_upsampler realesrgan --face_upsample -w 1.0 
 ```
 # For cropped and aligned faces (512x512)
 # Colorize black and white or faded photo
-python inference_inpainting.py --input_path [image folder]|[image path]
+python inference_colorization.py --input_path [image folder]|[image path]
 ```
 
 🎨 Face Inpainting (cropped and aligned face)
 ```
 # For cropped and aligned faces (512x512)
-# Inputs could be masked by white brush using a image editing app, e.g., Photoshop 
+# Inputs could be masked by white brush using an image editing app (e.g., Photoshop) 
 # (check out the examples in inputs/masked_faces)
-python inference_colorization.py --input_path [image folder]|[image path]
+python inference_inpainting.py --input_path [image folder]|[image path]
 ```
 
 
