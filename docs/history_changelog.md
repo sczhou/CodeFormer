@@ -1,5 +1,6 @@
 # History of Changelog
 
+- **2023.04.19**: :whale: Training codes and config files are public available now.
 - **2023.04.09**: Add features of inpainting and colorization for cropped face images.
 - **2023.02.10**: Include `dlib` as a new face detector option, it produces more accurate face identity.
 - **2022.10.05**: Support video input `--input_path [YOUR_VIDEO.mp4]`. Try it to enhance your videos! :clapper: 

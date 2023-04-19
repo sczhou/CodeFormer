@@ -1,0 +1,136 @@
+# general settings
+name: VQGAN-512-ds32-nearest-stage1
+model_type: VQGANModel
+num_gpu: 8
+manual_seed: 0
+
+# dataset and data loader settings
+datasets:
+  train:
+    name: FFHQ
+    type: FFHQBlindDataset
+    dataroot_gt: datasets/ffhq/ffhq_512
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+    in_size: 512
+    gt_size: 512
+    mean: [0.5, 0.5, 0.5]
+    std: [0.5, 0.5, 0.5]
+    use_hflip: true
+    use_corrupt: false # for VQGAN
+
+    # data loader
+    num_worker_per_gpu: 2
+    batch_size_per_gpu: 4
+    dataset_enlarge_ratio: 100
+
+    prefetch_mode: cpu
+    num_prefetch_queue: 4
+
+  # val:
+  #   name: CelebA-HQ-512
+  #   type: PairedImageDataset
+  #   dataroot_lq: datasets/faces/validation/gt
+  #   dataroot_gt: datasets/faces/validation/gt
+  #   io_backend:
+  #     type: disk
+  #   mean: [0.5, 0.5, 0.5]
+  #   std: [0.5, 0.5, 0.5]
+  #   scale: 1
+    
+# network structures
+network_g:
+  type: VQAutoEncoder
+  img_size: 512
+  nf: 64
+  ch_mult: [1, 2, 2, 4, 4, 8]
+  quantizer: 'nearest'
+  codebook_size: 1024
+
+network_d:
+  type: VQGANDiscriminator
+  nc: 3
+  ndf: 64
+
+# path
+path:
+  pretrain_network_g: ~
+  param_key_g: params_ema
+  strict_load_g: true
+  pretrain_network_d: ~
+  strict_load_d: true
+  resume_state: ~
+
+# base_lr(4.5e-6)*bach_size(4)
+train:
+  optim_g:
+    type: Adam
+    lr: !!float 7e-5
+    weight_decay: 0
+    betas: [0.9, 0.99]
+  optim_d:
+    type: Adam
+    lr: !!float 7e-5
+    weight_decay: 0
+    betas: [0.9, 0.99]
+
+  scheduler:
+    type: CosineAnnealingRestartLR
+    periods: [1600000]
+    restart_weights: [1]
+    eta_min: !!float 6e-5 # no lr reduce in official vqgan code
+
+  total_iter: 1600000
+
+  warmup_iter: -1  # no warm up
+  ema_decay: 0.995 # GFPGAN: 0.5**(32 / (10 * 1000) == 0.998; Unleashing: 0.995
+
+  pixel_opt:
+    type: L1Loss
+    loss_weight: 1.0
+    reduction: mean
+
+  perceptual_opt:
+    type: LPIPSLoss
+    loss_weight: 1.0
+    use_input_norm: true
+    range_norm: true
+
+  gan_opt:
+    type: GANLoss
+    gan_type: hinge
+    loss_weight: !!float 1.0 # adaptive_weighting
+
+  net_g_start_iter: 0
+  net_d_iters: 1
+  net_d_start_iter: 30001
+  manual_seed: 0
+
+# validation settings
+val:
+  val_freq: !!float 5e10 # no validation
+  save_img: true
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: false
+
+# logging settings
+logger:
+  print_freq: 100
+  save_checkpoint_freq: !!float 1e4
+  use_tb_logger: true
+  wandb:
+    project: ~
+    resume_id: ~
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29411
+
+find_unused_parameters: true

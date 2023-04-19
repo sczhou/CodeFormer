@@ -20,8 +20,9 @@ S-Lab, Nanyang Technological University
 
 :star: If CodeFormer is helpful to your images or projects, please help star this repo. Thanks! :hugs: 
 
-**[<font color=#d1585d>News</font>]**: :whale: *We regret to inform you that the release of our code will be postponed from its earlier plan. Nevertheless, we assure you that it will be made available **by the end of this April**. Thank you for your understanding and patience. Our apologies for any inconvenience this may cause.* 
+
 ### Update
+- **2023.04.19**: :whale: Training codes and config files are public available now.
 - **2023.04.09**: Add features of inpainting and colorization for cropped and aligned face images.
 - **2023.02.10**: Include `dlib` as a new face detector option, it produces more accurate face identity.
 - **2022.10.05**: Support video input `--input_path [YOUR_VIDEO.mp4]`. Try it to enhance your videos! :clapper: 
@@ -30,7 +31,7 @@ S-Lab, Nanyang Technological University
 - [**More**](docs/history_changelog.md)
 
 ### TODO
-- [ ] Add training code and config files
+- [x] Add training code and config files
 - [x] Add checkpoint and script for face inpainting
 - [x] Add checkpoint and script for face colorization
 - [x] ~~Add background image enhancement~~
@@ -77,13 +78,13 @@ conda install -c conda-forge dlib (only for face detection or cropping with dlib
 ### Quick Inference
 
 #### Download Pre-trained Models:
-Download the facelib and dlib pretrained models from [[Releases](https://github.com/sczhou/CodeFormer/releases) | [Google Drive](https://drive.google.com/drive/folders/1b_3qwrzY_kTQh0-SnBoGBgOrJ_PLZSKm?usp=sharing) | [OneDrive](https://entuedu-my.sharepoint.com/:f:/g/personal/s200094_e_ntu_edu_sg/EvDxR7FcAbZMp_MA9ouq7aQB8XTppMb3-T0uGZ_2anI2mg?e=DXsJFo)] to the `weights/facelib` folder. You can manually download the pretrained models OR download by running the following command:
+Download the facelib and dlib pretrained models from [[Releases](https://github.com/sczhou/CodeFormer/releases/tag/v0.1.0) | [Google Drive](https://drive.google.com/drive/folders/1b_3qwrzY_kTQh0-SnBoGBgOrJ_PLZSKm?usp=sharing) | [OneDrive](https://entuedu-my.sharepoint.com/:f:/g/personal/s200094_e_ntu_edu_sg/EvDxR7FcAbZMp_MA9ouq7aQB8XTppMb3-T0uGZ_2anI2mg?e=DXsJFo)] to the `weights/facelib` folder. You can manually download the pretrained models OR download by running the following command:
 ```
 python scripts/download_pretrained_models.py facelib
 python scripts/download_pretrained_models.py dlib (only for dlib face detector)
 ```
 
-Download the CodeFormer pretrained models from [[Releases](https://github.com/sczhou/CodeFormer/releases) | [Google Drive](https://drive.google.com/drive/folders/1CNNByjHDFt0b95q54yMVp6Ifo5iuU6QS?usp=sharing) | [OneDrive](https://entuedu-my.sharepoint.com/:f:/g/personal/s200094_e_ntu_edu_sg/EoKFj4wo8cdIn2-TY2IV6CYBhZ0pIG4kUOeHdPR_A5nlbg?e=AO8UN9)] to the `weights/CodeFormer` folder. You can manually download the pretrained models OR download by running the following command:
+Download the CodeFormer pretrained models from [[Releases](https://github.com/sczhou/CodeFormer/releases/tag/v0.1.0) | [Google Drive](https://drive.google.com/drive/folders/1CNNByjHDFt0b95q54yMVp6Ifo5iuU6QS?usp=sharing) | [OneDrive](https://entuedu-my.sharepoint.com/:f:/g/personal/s200094_e_ntu_edu_sg/EoKFj4wo8cdIn2-TY2IV6CYBhZ0pIG4kUOeHdPR_A5nlbg?e=AO8UN9)] to the `weights/CodeFormer` folder. You can manually download the pretrained models OR download by running the following command:
 ```
 python scripts/download_pretrained_models.py CodeFormer
 ```
@@ -141,7 +142,8 @@ python inference_colorization.py --input_path [image folder]|[image path]
 # (check out the examples in inputs/masked_faces)
 python inference_inpainting.py --input_path [image folder]|[image path]
 ```
-
+#### Training:
+You can find training commands in training documents: [English](docs/train.md) **|** [简体中文](docs/train_CN.md).
 
 ### Citation
 If our work is useful for your research, please consider citing:
@@ -162,4 +164,4 @@ This project is licensed under <a rel="license" href="https://github.com/sczhou/
 This project is based on [BasicSR](https://github.com/XPixelGroup/BasicSR). Some codes are brought from [Unleashing Transformers](https://github.com/samb-t/unleashing-transformers), [YOLOv5-face](https://github.com/deepcam-cn/yolov5-face), and [FaceXLib](https://github.com/xinntao/facexlib). We also adopt [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) to support background image enhancement. Thanks for their awesome works.
 
 ### Contact
-If you have any questions, please feel free to reach me out at `shangchenzhou@gmail.com`.
+If you have any questions, please feel free to reach me out at `shangchenzhou@gmail.com`. 
