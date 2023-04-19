@@ -143,7 +143,7 @@ python inference_colorization.py --input_path [image folder]|[image path]
 python inference_inpainting.py --input_path [image folder]|[image path]
 ```
 #### Training:
-You can find training commands in training documents: [English](docs/train.md) **|** [简体中文](docs/train_CN.md).
+The training commands can be found in the documents: [English](docs/train.md) **|** [简体中文](docs/train_CN.md).
 
 ### Citation
 If our work is useful for your research, please consider citing:

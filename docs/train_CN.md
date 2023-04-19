@@ -8,7 +8,7 @@
 
 ## 训练
 
-#### 👾 阶段 I - VQGAN
+### 👾 阶段 I - VQGAN
 - 训练VQGAN:
   > python -m torch.distributed.launch --nproc_per_node=8 --master_port=4321 basicsr/train.py -opt options/VQGAN_512_ds32_nearest_stage1.yml --launcher pytorch
 
@@ -17,11 +17,11 @@
 
 - 如果你不需要训练自己的VQGAN，可以在Release v0.1.0文档中找到预训练的VQGAN和对应的密码本序列: https://github.com/sczhou/CodeFormer/releases/tag/v0.1.0
 
-#### 🚀 阶段 II - CodeFormer (w=0)
+### 🚀 阶段 II - CodeFormer (w=0)
 - 训练密码本训练预测模块:
   > python -m torch.distributed.launch --nproc_per_node=8 --master_port=4322 basicsr/train.py -opt options/CodeFormer_stage2.yml --launcher pytorch
 
-#### 🛸 阶段 III - CodeFormer (w=1)
+### 🛸 阶段 III - CodeFormer (w=1)
 - 训练可调模块:
   > python -m torch.distributed.launch --nproc_per_node=8 --master_port=4323 basicsr/train.py -opt options/CodeFormer_stage3.yml --launcher pytorch
 
