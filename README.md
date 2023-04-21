@@ -142,7 +142,7 @@ python inference_colorization.py --input_path [image folder]|[image path]
 # (check out the examples in inputs/masked_faces)
 python inference_inpainting.py --input_path [image folder]|[image path]
 ```
-#### Training:
+### Training:
 The training commands can be found in the documents: [English](docs/train.md) **|** [简体中文](docs/train_CN.md).
 
 ### Citation
