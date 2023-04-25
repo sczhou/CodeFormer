@@ -20,7 +20,6 @@ datasets:
     std: [0.5, 0.5, 0.5]
     use_hflip: true
     use_corrupt: true
-    latent_gt_path: ~
 
     # large degradation in stageII
     blur_kernel_size: 41
@@ -39,7 +38,8 @@ datasets:
     color_jitter_pt_prob: 0.3
     gray_prob: 0.01
 
-    latent_gt_path: './experiments/pretrained_models/VQGAN/latent_gt_code1024.pth'
+    latent_gt_path: ~ # without pre-calculated latent code
+    # latent_gt_path: './experiments/pretrained_models/VQGAN/latent_gt_code1024.pth'
 
     # data loader
     num_worker_per_gpu: 2
@@ -68,6 +68,14 @@ network_g:
   connect_list: ['32', '64', '128', '256']
   fix_modules: ['quantize','generator']
   vqgan_path: './experiments/pretrained_models/vqgan/vqgan_code1024.pth' # pretrained VQGAN 
+
+network_vqgan: # this config is needed if no pre-calculated latent
+  type: VQAutoEncoder
+  img_size: 512
+  nf: 64
+  ch_mult: [1, 2, 2, 4, 4, 8]
+  quantizer: 'nearest'
+  codebook_size: 1024
 
 # path
 path:

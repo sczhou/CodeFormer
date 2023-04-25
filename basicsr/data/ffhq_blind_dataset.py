@@ -4,21 +4,22 @@ import random
 import numpy as np
 import os.path as osp
 from scipy.io import loadmat
+from PIL import Image
 import torch
 import torch.utils.data as data
 from torchvision.transforms.functional import (adjust_brightness, adjust_contrast, 
                                         adjust_hue, adjust_saturation, normalize)
 from basicsr.data import gaussian_kernels as gaussian_kernels
 from basicsr.data.transforms import augment
-from basicsr.data.data_util import paths_from_folder
+from basicsr.data.data_util import paths_from_folder, brush_stroke_mask, random_ff_mask
 from basicsr.utils import FileClient, get_root_logger, imfrombytes, img2tensor
 from basicsr.utils.registry import DATASET_REGISTRY
 
 @DATASET_REGISTRY.register()
-class FFHQBlindJointDataset(data.Dataset):
+class FFHQBlindDataset(data.Dataset):
 
     def __init__(self, opt):
-        super(FFHQBlindJointDataset, self).__init__()
+        super(FFHQBlindDataset, self).__init__()
         logger = get_root_logger()
         self.opt = opt
         # file client (io backend)
@@ -60,6 +61,20 @@ class FFHQBlindJointDataset(data.Dataset):
         else:
             self.paths = paths_from_folder(self.gt_folder)
 
+        # inpainting mask
+        self.gen_inpaint_mask = opt.get('gen_inpaint_mask', False)
+        if self.gen_inpaint_mask:
+            logger.info(f'generate mask ...')
+            # self.mask_max_angle = opt.get('mask_max_angle', 10)
+            # self.mask_max_len = opt.get('mask_max_len', 150)
+            # self.mask_max_width = opt.get('mask_max_width', 50)
+            # self.mask_draw_times = opt.get('mask_draw_times', 10)
+            # # print
+            # logger.info(f'mask_max_angle: {self.mask_max_angle}')
+            # logger.info(f'mask_max_len: {self.mask_max_len}')
+            # logger.info(f'mask_max_width: {self.mask_max_width}')
+            # logger.info(f'mask_draw_times: {self.mask_draw_times}')
+
         # perform corrupt
         self.use_corrupt = opt.get('use_corrupt', True)
         self.use_motion_kernel = False
@@ -70,22 +85,15 @@ class FFHQBlindJointDataset(data.Dataset):
             motion_kernel_path = opt.get('motion_kernel_path', 'basicsr/data/motion-blur-kernels-32.pth')
             self.motion_kernels = torch.load(motion_kernel_path)
 
-        if self.use_corrupt:
+        if self.use_corrupt and not self.gen_inpaint_mask:
             # degradation configurations
-            self.blur_kernel_size = self.opt['blur_kernel_size']
-            self.kernel_list = self.opt['kernel_list']
-            self.kernel_prob = self.opt['kernel_prob']
-            # Small degradation
-            self.blur_sigma = self.opt['blur_sigma']
-            self.downsample_range = self.opt['downsample_range']
-            self.noise_range = self.opt['noise_range']
-            self.jpeg_range = self.opt['jpeg_range']
-            # Large degradation
-            self.blur_sigma_large = self.opt['blur_sigma_large']
-            self.downsample_range_large = self.opt['downsample_range_large']
-            self.noise_range_large = self.opt['noise_range_large']
-            self.jpeg_range_large = self.opt['jpeg_range_large']
-
+            self.blur_kernel_size = opt['blur_kernel_size']
+            self.blur_sigma = opt['blur_sigma']
+            self.kernel_list = opt['kernel_list']
+            self.kernel_prob = opt['kernel_prob']
+            self.downsample_range = opt['downsample_range']
+            self.noise_range = opt['noise_range']
+            self.jpeg_range = opt['jpeg_range']
             # print
             logger.info(f'Blur: blur_kernel_size {self.blur_kernel_size}, sigma: [{", ".join(map(str, self.blur_sigma))}]')
             logger.info(f'Downsample: downsample_range [{", ".join(map(str, self.downsample_range))}]')
@@ -192,7 +200,7 @@ class FFHQBlindJointDataset(data.Dataset):
 
         # generate in image
         img_in = img_gt
-        if self.use_corrupt:
+        if self.use_corrupt and not self.gen_inpaint_mask:
             # motion blur
             if self.use_motion_kernel and random.random() < self.motion_kernel_prob:
                 m_i = random.randint(0,31)
@@ -231,63 +239,30 @@ class FFHQBlindJointDataset(data.Dataset):
             # resize to in_size
             img_in = cv2.resize(img_in, (self.in_size, self.in_size), interpolation=cv2.INTER_LINEAR)
 
+        # if self.gen_inpaint_mask:
+        #     inpaint_mask = random_ff_mask(shape=(self.gt_size,self.gt_size), 
+        #         max_angle = self.mask_max_angle, max_len = self.mask_max_len, 
+        #         max_width = self.mask_max_width, times = self.mask_draw_times)
+        #     img_in = img_in * (1 - inpaint_mask.reshape(self.gt_size,self.gt_size,1)) + \
+        #              1.0 * inpaint_mask.reshape(self.gt_size,self.gt_size,1)
 
-        # generate in_large with large degradation
-        img_in_large = img_gt
+        #     inpaint_mask = torch.from_numpy(inpaint_mask).view(1,self.gt_size,self.gt_size)
 
-        if self.use_corrupt:
-            # motion blur
-            if self.use_motion_kernel and random.random() < self.motion_kernel_prob:
-                m_i = random.randint(0,31)
-                k = self.motion_kernels[f'{m_i:02d}']
-                img_in_large = cv2.filter2D(img_in_large,-1,k)
-            
-            # gaussian blur
-            kernel = gaussian_kernels.random_mixed_kernels(
-                self.kernel_list,
-                self.kernel_prob,
-                self.blur_kernel_size,
-                self.blur_sigma_large,
-                self.blur_sigma_large, 
-                [-math.pi, math.pi],
-                noise_range=None)
-            img_in_large = cv2.filter2D(img_in_large, -1, kernel)
-
-            # downsample
-            scale = np.random.uniform(self.downsample_range_large[0], self.downsample_range_large[1])
-            img_in_large = cv2.resize(img_in_large, (int(self.gt_size // scale), int(self.gt_size // scale)), interpolation=cv2.INTER_LINEAR)
-
-            # noise
-            if self.noise_range_large is not None:
-                noise_sigma = np.random.uniform(self.noise_range_large[0] / 255., self.noise_range_large[1] / 255.)
-                noise = np.float32(np.random.randn(*(img_in_large.shape))) * noise_sigma
-                img_in_large = img_in_large + noise
-                img_in_large = np.clip(img_in_large, 0, 1)
-
-            # jpeg
-            if self.jpeg_range_large is not None:
-                jpeg_p = np.random.uniform(self.jpeg_range_large[0], self.jpeg_range_large[1])
-                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), jpeg_p]
-                _, encimg = cv2.imencode('.jpg', img_in_large * 255., encode_param)
-                img_in_large = np.float32(cv2.imdecode(encimg, 1)) / 255.
-
-            # resize to in_size
-            img_in_large = cv2.resize(img_in_large, (self.in_size, self.in_size), interpolation=cv2.INTER_LINEAR)
-
+        if self.gen_inpaint_mask:
+            img_in = (img_in*255).astype('uint8')
+            img_in = brush_stroke_mask(Image.fromarray(img_in))
+            img_in = np.array(img_in) / 255.
 
         # random color jitter (only for lq)
         if self.color_jitter_prob is not None and (np.random.uniform() < self.color_jitter_prob):
             img_in = self.color_jitter(img_in, self.color_jitter_shift)
-            img_in_large = self.color_jitter(img_in_large, self.color_jitter_shift)
         # random to gray (only for lq)
         if self.gray_prob and np.random.uniform() < self.gray_prob:
             img_in = cv2.cvtColor(img_in, cv2.COLOR_BGR2GRAY)
             img_in = np.tile(img_in[:, :, None], [1, 1, 3])
-            img_in_large = cv2.cvtColor(img_in_large, cv2.COLOR_BGR2GRAY)
-            img_in_large = np.tile(img_in_large[:, :, None], [1, 1, 3])
 
         # BGR to RGB, HWC to CHW, numpy to tensor
-        img_in, img_in_large, img_gt = img2tensor([img_in, img_in_large, img_gt], bgr2rgb=True, float32=True)
+        img_in, img_gt = img2tensor([img_in, img_gt], bgr2rgb=True, float32=True)
 
         # random color jitter (pytorch version) (only for lq)
         if self.color_jitter_pt_prob is not None and (np.random.uniform() < self.color_jitter_pt_prob):
@@ -296,19 +271,16 @@ class FFHQBlindJointDataset(data.Dataset):
             saturation = self.opt.get('saturation', (0, 1.5))
             hue = self.opt.get('hue', (-0.1, 0.1))
             img_in = self.color_jitter_pt(img_in, brightness, contrast, saturation, hue)
-            img_in_large = self.color_jitter_pt(img_in_large, brightness, contrast, saturation, hue)
 
         # round and clip
         img_in = np.clip((img_in * 255.0).round(), 0, 255) / 255.
-        img_in_large = np.clip((img_in_large * 255.0).round(), 0, 255) / 255.
 
         # Set vgg range_norm=True if use the normalization here
         # normalize
         normalize(img_in, self.mean, self.std, inplace=True)
-        normalize(img_in_large, self.mean, self.std, inplace=True)
         normalize(img_gt, self.mean, self.std, inplace=True)
 
-        return_dict = {'in': img_in, 'in_large_de': img_in_large, 'gt': img_gt, 'gt_path': gt_path}
+        return_dict = {'in': img_in, 'gt': img_gt, 'gt_path': gt_path}
 
         if self.crop_components:
             return_dict['locations_in'] = locations_in
@@ -316,6 +288,9 @@ class FFHQBlindJointDataset(data.Dataset):
 
         if self.load_latent_gt:
             return_dict['latent_gt'] = latent_gt
+
+        # if self.gen_inpaint_mask:
+        #     return_dict['inpaint_mask'] = inpaint_mask
 
         return return_dict
 

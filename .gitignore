@@ -123,5 +123,9 @@ venv.bak/
 
 # project
 results/
+experiments/
+tb_logger/
+run.sh
+*debug*
 *_old*
 

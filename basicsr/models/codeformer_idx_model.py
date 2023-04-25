@@ -43,14 +43,18 @@ class CodeFormerIdxModel(SRModel):
                 self.model_ema(0)  # copy net_g weight
             self.net_g_ema.eval()
 
-        if self.opt.get('network_vqgan', None) is not None and self.opt['datasets'].get('latent_gt_path') is None:
+        if self.opt['datasets']['train'].get('latent_gt_path', None) is not None:
+            self.generate_idx_gt = False
+        elif self.opt.get('network_vqgan', None) is not None:
             self.hq_vqgan_fix = build_network(self.opt['network_vqgan']).to(self.device)
             self.hq_vqgan_fix.eval()
             self.generate_idx_gt = True
             for param in self.hq_vqgan_fix.parameters():
                 param.requires_grad = False
         else:
-            self.generate_idx_gt = False
+            raise NotImplementedError(f'Shoule have network_vqgan config or pre-calculated latent code.')
+        
+        logger.info(f'Need to generate latent GT code: {self.generate_idx_gt}')
 
         self.hq_feat_loss = train_opt.get('use_hq_feat_loss', True)
         self.feat_loss_weight = train_opt.get('feat_loss_weight', 1.0)
