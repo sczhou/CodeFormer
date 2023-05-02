@@ -16,8 +16,9 @@ pretrain_model_url = {
     'restoration': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/codeformer.pth',
 }
 
-def set_realesrgan():
+def set_realesrgan(model_name):
     from basicsr.archs.rrdbnet_arch import RRDBNet
+    from basicsr.archs.srvgg_arch import SRVGGNetCompact
     from basicsr.utils.realesrgan_utils import RealESRGANer
 
     use_half = False
@@ -26,20 +27,46 @@ def set_realesrgan():
         if not True in [gpu in torch.cuda.get_device_name(0) for gpu in no_half_gpu_list]:
             use_half = True
 
-    model = RRDBNet(
+    """model = RRDBNet(
         num_in_ch=3,
         num_out_ch=3,
         num_feat=64,
         num_block=23,
         num_grow_ch=32,
         scale=4,
-    )
+    )"""
+
+    if model_name == 'RealESRGAN_x4plus':  # x4 RRDBNet model
+        model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=4)
+        netscale = 4
+        file_url = 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth'
+    elif model_name == 'RealESRNet_x4plus':  # x4 RRDBNet model
+        model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=4)
+        netscale = 4
+        file_url = 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.1/RealESRNet_x4plus.pth'
+    elif model_name == 'RealESRGAN_x4plus_anime_6B':  # x4 RRDBNet model with 6 blocks
+        model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=6, num_grow_ch=32, scale=4)
+        netscale = 4
+        file_url = 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.2.4/RealESRGAN_x4plus_anime_6B.pth'
+    elif model_name == 'RealESRGAN_x2plus':  # x2 RRDBNet model
+        model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=2)
+        netscale = 2
+        file_url = 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.1/RealESRGAN_x2plus.pth'
+    elif model_name == 'realesr-animevideov3':  # x4 VGG-style model (XS size)
+        model = SRVGGNetCompact(num_in_ch=3, num_out_ch=3, num_feat=64, num_conv=16, upscale=4, act_type='prelu')
+        netscale = 4
+        file_url = 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-animevideov3.pth'
+    elif model_name == 'realesr-general-x4v3':  # x4 VGG-style model (S size)
+        model = SRVGGNetCompact(num_in_ch=3, num_out_ch=3, num_feat=64, num_conv=32, upscale=4, act_type='prelu')
+        netscale = 4
+        file_url = 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-general-x4v3.pth'
+
     upsampler = RealESRGANer(
-        scale=4,
-        model_path="https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth",
+        scale=netscale,
+        model_path=file_url,
         model=model,
-        tile=args.bg_tile,
-        tile_pad=40,
+        tile=args.bg_tile_size,
+        tile_pad=args.bg_tile_pad,
         pre_pad=0,
         half=use_half
     )
@@ -73,9 +100,12 @@ if __name__ == '__main__':
     parser.add_argument('--detection_model', type=str, default='retinaface_resnet50',
             help='Face detector. Optional: retinaface_resnet50, retinaface_mobile0.25, YOLOv5l, YOLOv5n, dlib. \
                 Default: retinaface_resnet50')
-    parser.add_argument('--bg_upsampler', type=str, default='None', help='Background upsampler. Optional: realesrgan')
+    parser.add_argument('--bg_upsampler', type=str, default='None',
+            help='Background upsampler. Optional: RealESRGAN_x4plus | RealESRNet_x4plus | RealESRGAN_x4plus_anime_6B | RealESRGAN_x2plus | '
+                'realesr-animevideov3 | realesr-general-x4v3')
     parser.add_argument('--face_upsample', action='store_true', help='Face upsampler after enhancement. Default: False')
-    parser.add_argument('--bg_tile', type=int, default=400, help='Tile size for background sampler. Default: 400')
+    parser.add_argument('--bg_tile_size', type=int, default=0, help='Tile size for background sampler. Default: 0')
+    parser.add_argument('--bg_tile_pad', type=int, default=10, help='Tile padding for background sampler. Default: 10')
     parser.add_argument('--suffix', type=str, default=None, help='Suffix of the restored faces. Default: None')
     parser.add_argument('--save_video_fps', type=float, default=None, help='Frame rate for saving video. Default: None')
 
@@ -117,8 +147,9 @@ if __name__ == '__main__':
             '\tNote that --input_path for video should end with .mp4|.mov|.avi')
 
     # ------------------ set up background upsampler ------------------
-    if args.bg_upsampler == 'realesrgan':
-        bg_upsampler = set_realesrgan()
+    #if args.bg_upsampler == 'realesrgan':
+    if args.bg_upsampler != "None":
+        bg_upsampler = set_realesrgan(args.bg_upsampler)
     else:
         bg_upsampler = None
 
@@ -148,7 +179,7 @@ if __name__ == '__main__':
     if not args.has_aligned:
         print(f'Face detection model: {args.detection_model}')
     if bg_upsampler is not None:
-        print(f'Background upsampling: True, Face upsampling: {args.face_upsample}')
+        print(f'Background upsampling: {args.bg_upsampler}, Face upsampling: {args.face_upsample}')
     else:
         print(f'Background upsampling: False, Face upsampling: {args.face_upsample}')
 
