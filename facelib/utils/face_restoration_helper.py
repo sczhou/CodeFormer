@@ -145,9 +145,9 @@ class FaceRestoreHelper(object):
         if self.is_gray:
             print('Grayscale input: True')
 
-        if min(self.input_img.shape[:2])<512:
+        """if min(self.input_img.shape[:2])<512:
             f = 512.0/min(self.input_img.shape[:2])
-            self.input_img = cv2.resize(self.input_img, (0,0), fx=f, fy=f, interpolation=cv2.INTER_LINEAR)
+            self.input_img = cv2.resize(self.input_img, (0,0), fx=f, fy=f, interpolation=cv2.INTER_LINEAR)"""
 
     def init_dlib(self, detection_path, landmark5_path):
         """Initialize the dlib detectors and predictors."""
