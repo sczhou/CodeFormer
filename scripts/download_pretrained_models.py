@@ -1,7 +1,6 @@
 import argparse
 import os
 from os import path as osp
-
 from basicsr.utils.download_util import load_file_from_url
 
 

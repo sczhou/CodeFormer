@@ -3,6 +3,7 @@ import cv2
 import argparse
 import glob
 import torch
+import warnings
 from torchvision.transforms.functional import normalize
 from basicsr.utils import imwrite, img2tensor, tensor2img
 from basicsr.utils.download_util import load_file_from_url
@@ -45,7 +46,7 @@ def set_realesrgan():
     )
 
     if not gpu_is_available():  # CPU
-        import warnings
+        
         warnings.warn('Running on CPU now! Make sure your PyTorch version matches your CUDA.'
                         'The unoptimized RealESRGAN is slow on CPU. '
                         'If you want to disable it, please remove `--bg_upsampler` and `--face_upsample` in command.',
