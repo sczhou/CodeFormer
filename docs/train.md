@@ -15,17 +15,19 @@
 - After VQGAN training, you can pre-calculate code sequence for the training dataset to speed up the later training stages:
   > python scripts/generate_latent_gt.py
 
-- If you don't require training your own VQGAN, you can find pre-trained VQGAN and the corresponding code sequence in the folder of Releases v0.1.0: https://github.com/sczhou/CodeFormer/releases/tag/v0.1.0
+- If you don't require training your own VQGAN, you can find pre-trained VQGAN (`vqgan_code1024.pth`) and the corresponding code sequence (`latent_gt_code1024.pth`) in the folder of Releases v0.1.0: https://github.com/sczhou/CodeFormer/releases/tag/v0.1.0
 
 ### 🚀 Stage II - CodeFormer (w=0)
 - Training Code Sequence Prediction Module:
   > python -m torch.distributed.launch --nproc_per_node=8 --master_port=4322 basicsr/train.py -opt options/CodeFormer_stage2.yml --launcher pytorch
 
+- Pre-trained CodeFormer of stage II (`codeformer_stage2.pth`) can be found in the folder of Releases v0.1.0: https://github.com/sczhou/CodeFormer/releases/tag/v0.1.0
+
 ### 🛸 Stage III - CodeFormer (w=1)
 - Training Controllable Module:
   > python -m torch.distributed.launch --nproc_per_node=8 --master_port=4323 basicsr/train.py -opt options/CodeFormer_stage3.yml --launcher pytorch
 
-- Pre-trained CodeFormer can be found in the folder of Releases v0.1.0: https://github.com/sczhou/CodeFormer/releases/tag/v0.1.0
+- Pre-trained CodeFormer (`codeformer.pth`) can be found in the folder of Releases v0.1.0: https://github.com/sczhou/CodeFormer/releases/tag/v0.1.0
 
 ---
 
