@@ -4,7 +4,6 @@ https://huggingface.co/spaces/sczhou/CodeFormer
 """
 
 import sys
-sys.path.append('CodeFormer')
 import os
 import cv2
 import torch
@@ -25,6 +24,7 @@ from facelib.utils.misc import is_gray
 
 
 os.system("pip freeze")
+sys.path.append('CodeFormer')
 
 pretrain_model_url = {
     'codeformer': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/codeformer.pth',
