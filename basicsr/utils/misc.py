@@ -9,7 +9,7 @@ from os import path as osp
 from .dist_util import master_only
 from .logger import get_root_logger
 
-IS_HIGH_VERSION = [int(m) for m in list(re.findall(r"^([0-9]+)\.([0-9]+)\.([0-9]+)([^0-9][a-zA-Z0-9]*)?(\+git.*)?$",\
+IS_HIGH_VERSION = [int(m) for m in list(re.findall(r"^(\d+)\.(\d+)\.(\d+)([\w\d\.].*)?$",\
     torch.__version__)[0][:3])] >= [1, 12, 0]
 
 def gpu_is_available():
