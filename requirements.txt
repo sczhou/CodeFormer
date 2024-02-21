@@ -3,7 +3,7 @@ future
 lmdb
 numpy
 opencv-python
-Pillow
+Pillow==9.5.0
 pyyaml
 requests
 scikit-image
