@@ -51,7 +51,8 @@ def set_realesrgan(bg_tile):
     if not gpu_is_available():
         import warnings
         warnings.warn(
-            'Running on CPU now! Make sure your PyTorch version matches your CUDA. The unoptimized RealESRGAN is slow on CPU.',
+            'Running on CPU now! Make sure your PyTorch version matches your CUDA. The unoptimized RealESRGAN is slow '
+            'on CPU.',
             category=RuntimeWarning)
     return upsampler
 
@@ -62,21 +63,13 @@ restore_face_route_v1 = Blueprint('restore_face_v1', __name__, url_prefix='/v1/r
 @restore_face_route_v1.route("/image", methods=["POST"])
 def restore_face():
     r = ImageRestoreFace(**request.get_json())
-    restored_images = []
     device = get_device()
 
     bg_upsampler = set_realesrgan(r.bg_tile) if r.bg_upsampler == 'realesrgan' else None
-    if r.face_upsampler:
-        if bg_upsampler:
-            face_upsampler = bg_upsampler
-        else:
-            face_upsampler = set_realesrgan()
-    else:
-        face_upsampler = None
+    face_upsampler = bg_upsampler if r.face_upsampler else None
 
     net = ARCH_REGISTRY.get('CodeFormer')(dim_embd=512, codebook_size=1024, n_head=8, n_layers=9,
                                           connect_list=['32', '64', '128', '256']).to(device)
-    # ckpt_path = models/CodeFormer
     ckpt_path = load_file_from_url(url=pretrain_model_url['restoration'], model_dir='models/CodeFormer', progress=True)
     checkpoint = torch.load(ckpt_path)['params_ema']
     net.load_state_dict(checkpoint)
@@ -128,10 +121,7 @@ def restore_face():
             restored_img = face_helper.paste_faces_to_input_image(upsample_img=bg_img, draw_box=r.draw_box,
                                                                   face_upsampler=face_upsampler) if face_upsampler else face_helper.paste_faces_to_input_image(
                 upsample_img=bg_img, draw_box=r.draw_box)
-            restored_images.append(restored_img)
-
-        for restored_image in restored_images:
-            _, buffer = cv2.imencode('.png', restored_image)
+            _, buffer = cv2.imencode('.png', restored_img)
             img_b64 = base64.b64encode(buffer).decode('utf-8')
             restored_images.append(img_b64)
 

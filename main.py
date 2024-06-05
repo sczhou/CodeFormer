@@ -1,5 +1,4 @@
 import argparse
-import logging
 
 from flask import Flask, Blueprint, jsonify
 
