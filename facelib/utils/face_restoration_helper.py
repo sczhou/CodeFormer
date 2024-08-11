@@ -6,7 +6,7 @@ from torchvision.transforms.functional import normalize
 
 from facelib.detection import init_detection_model
 from facelib.parsing import init_parsing_model
-from facelib.utils.misc import img2tensor, imwrite, is_gray, bgr2gray, adain_npy
+from facelib.utils.misc import img2tensor, imwrite, color_diff, bgr2gray, adain_npy
 from basicsr.utils.download_util import load_file_from_url
 from basicsr.utils.misc import get_device
 
@@ -141,13 +141,23 @@ class FaceRestoreHelper(object):
             img = img[:, :, 0:3]
 
         self.input_img = img
-        self.is_gray = is_gray(img, threshold=10)
+        self.color_diff = color_diff(img)
+        self.is_gray = (self.color_diff <= 10)
         if self.is_gray:
             print('Grayscale input: True')
 
         if min(self.input_img.shape[:2])<512:
             f = 512.0/min(self.input_img.shape[:2])
             self.input_img = cv2.resize(self.input_img, (0,0), fx=f, fy=f, interpolation=cv2.INTER_LINEAR)
+
+    def read_aligned(self, img, gray_threshold = 10):
+        # the input faces are already cropped and aligned
+        img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_LINEAR)
+        self.color_diff = color_diff(img)
+        self.is_gray = (self.color_diff <= gray_threshold)
+        if self.is_gray:
+            print('Grayscale input: True')
+        self.cropped_faces = [img]
 
     def init_dlib(self, detection_path, landmark5_path):
         """Initialize the dlib detectors and predictors."""
@@ -364,7 +374,7 @@ class FaceRestoreHelper(object):
     def add_restored_face(self, restored_face, input_face=None):
         if self.is_gray:
             restored_face = bgr2gray(restored_face) # convert img into grayscale
-            if input_face is not None:
+            if self.color_diff >= 1 and input_face is not None:
                 restored_face = adain_npy(restored_face, input_face) # transfer the color
         self.restored_faces.append(restored_face)
 

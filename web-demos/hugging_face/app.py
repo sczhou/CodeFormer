@@ -21,7 +21,6 @@ from basicsr.utils.realesrgan_utils import RealESRGANer
 from basicsr.utils.registry import ARCH_REGISTRY
 
 from facelib.utils.face_restoration_helper import FaceRestoreHelper
-from facelib.utils.misc import is_gray
 
 
 os.system("pip freeze")
@@ -140,12 +139,7 @@ def inference(image, background_enhance, face_upsample, upscale, codeformer_fide
         face_upsampler = upsampler if face_upsample else None
 
         if has_aligned:
-            # the input faces are already cropped and aligned
-            img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_LINEAR)
-            face_helper.is_gray = is_gray(img, threshold=5)
-            if face_helper.is_gray:
-                print('\tgrayscale input: True')
-            face_helper.cropped_faces = [img]
+            face_helper.read_aligned(img, gray_threshold=5)
         else:
             face_helper.read_image(img)
             # get face landmarks for each face

@@ -143,7 +143,7 @@ def scandir(dir_path, suffix=None, recursive=False, full_path=False):
     return _scandir(dir_path, suffix=suffix, recursive=recursive)
 
 
-def is_gray(img, threshold=10):
+def color_diff(img):
     img = Image.fromarray(img)
     if len(img.getbands()) == 1:
         return True
@@ -153,8 +153,10 @@ def is_gray(img, threshold=10):
     diff1 = (img1 - img2).var()
     diff2 = (img2 - img3).var()
     diff3 = (img3 - img1).var()
-    diff_sum = (diff1 + diff2 + diff3) / 3.0
-    if diff_sum <= threshold:
+    return (diff1 + diff2 + diff3) / 3.0
+
+def is_gray(img, threshold=10):
+    if color_diff(img) <= threshold:
         return True
     else:
         return False

@@ -8,7 +8,6 @@ from basicsr.utils import imwrite, img2tensor, tensor2img
 from basicsr.utils.download_util import load_file_from_url
 from basicsr.utils.misc import gpu_is_available, get_device
 from facelib.utils.face_restoration_helper import FaceRestoreHelper
-from facelib.utils.misc import is_gray
 
 from basicsr.utils.registry import ARCH_REGISTRY
 
@@ -178,12 +177,7 @@ if __name__ == '__main__':
             img = img_path
 
         if args.has_aligned: 
-            # the input faces are already cropped and aligned
-            img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_LINEAR)
-            face_helper.is_gray = is_gray(img, threshold=10)
-            if face_helper.is_gray:
-                print('Grayscale input: True')
-            face_helper.cropped_faces = [img]
+            face_helper.read_aligned(img)
         else:
             face_helper.read_image(img)
             # get face landmarks for each face
