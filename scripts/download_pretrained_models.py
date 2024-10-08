@@ -6,6 +6,8 @@ from basicsr.utils.download_util import load_file_from_url
 
 
 def download_pretrained_models(method, file_urls):
+    if method == 'CodeFormer_train':
+        method = 'CodeFormer'
     save_path_root = f'./weights/{method}'
     os.makedirs(save_path_root, exist_ok=True)
 
@@ -24,6 +26,12 @@ if __name__ == '__main__':
 
     file_urls = {
         'CodeFormer': {
+            'codeformer.pth': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/codeformer.pth'
+        },
+        'CodeFormer_train': {
+            'vqgan_code1024.pth': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/vqgan_code1024.pth',
+            'latent_gt_code1024.pth': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/latent_gt_code1024.pth',
+            'codeformer_stage2.pth': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/codeformer_stage2.pth',
             'codeformer.pth': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/codeformer.pth'
         },
         'facelib': {
