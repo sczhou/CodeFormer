@@ -232,7 +232,7 @@ class FFHQBlindDataset(data.Dataset):
             # jpeg
             if self.jpeg_range is not None:
                 jpeg_p = np.random.uniform(self.jpeg_range[0], self.jpeg_range[1])
-                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), jpeg_p]
+                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), int(jpeg_p)]
                 _, encimg = cv2.imencode('.jpg', img_in * 255., encode_param)
                 img_in = np.float32(cv2.imdecode(encimg, 1)) / 255.
 

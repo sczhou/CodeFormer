@@ -85,7 +85,7 @@ network_d:
 path:
   pretrain_network_g: './experiments/pretrained_models/CodeFormer_stage2/net_g_latest.pth' # pretrained G model in StageII 
   param_key_g: params_ema
-  strict_load_g: true
+  strict_load_g: false
   pretrain_network_d: './experiments/pretrained_models/CodeFormer_stage2/net_d_latest.pth' # pretrained D model in StageII
   resume_state: ~
 
