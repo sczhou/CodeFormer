@@ -113,7 +113,7 @@ python inference_codeformer.py -w 0.5 --has_aligned --input_path [image folder]|
 ```
 # For whole image
 # Add '--bg_upsampler realesrgan' to enhance the background regions with Real-ESRGAN
-# Add '--face_upsample' to further upsample restorated face with Real-ESRGAN
+# Add '--face_upsample' to further upsample restored face with Real-ESRGAN
 python inference_codeformer.py -w 0.7 --input_path [image folder]|[image path]
 ```
 
