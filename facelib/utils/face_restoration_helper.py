@@ -208,7 +208,7 @@ class FaceRestoreHelper(object):
         else:
             h, w = self.input_img.shape[0:2]
             scale = resize / min(h, w)
-            scale = max(1, scale) # always scale up
+            # scale = max(1, scale) # always scale up; comment this out for HD images, e.g., AIGC faces.
             h, w = int(h * scale), int(w * scale)
             interp = cv2.INTER_AREA if scale < 1 else cv2.INTER_LINEAR
             input_img = cv2.resize(self.input_img, (w, h), interpolation=interp)
