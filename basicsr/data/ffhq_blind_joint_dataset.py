@@ -45,11 +45,7 @@ class FFHQBlindJointDataset(data.Dataset):
         else:
             self.crop_components = False
 
-        if self.latent_gt_path is not None:
-            self.load_latent_gt = True            
-            self.latent_gt_dict = torch.load(self.latent_gt_path)
-        else:
-            self.load_latent_gt = False  
+        self.latent_gt_dict = None
 
         if self.io_backend_opt['type'] == 'lmdb':
             self.io_backend_opt['db_paths'] = self.gt_folder
@@ -169,6 +165,14 @@ class FFHQBlindJointDataset(data.Dataset):
 
 
     def __getitem__(self, index):
+        
+        if self.latent_gt_path is not None:
+            self.load_latent_gt = True     
+            if self.latent_gt_dict is None:       
+                self.latent_gt_dict = torch.load(self.latent_gt_path)
+        else:
+            self.load_latent_gt = False  
+            
         if self.file_client is None:
             self.file_client = FileClient(self.io_backend_opt.pop('type'), **self.io_backend_opt)
 
