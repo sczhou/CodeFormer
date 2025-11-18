@@ -143,7 +143,7 @@ def scandir(dir_path, suffix=None, recursive=False, full_path=False):
     return _scandir(dir_path, suffix=suffix, recursive=recursive)
 
 
-def is_gray(img, threshold=10):
+def color_diff(img):
     img = Image.fromarray(img)
     if len(img.getbands()) == 1:
         return True
@@ -153,8 +153,10 @@ def is_gray(img, threshold=10):
     diff1 = (img1 - img2).var()
     diff2 = (img2 - img3).var()
     diff3 = (img3 - img1).var()
-    diff_sum = (diff1 + diff2 + diff3) / 3.0
-    if diff_sum <= threshold:
+    return (diff1 + diff2 + diff3) / 3.0
+
+def is_gray(img, threshold=10):
+    if color_diff(img) <= threshold:
         return True
     else:
         return False
@@ -199,4 +201,18 @@ def adain_npy(content_feat, style_feat):
     style_mean, style_std = calc_mean_std(style_feat)
     content_mean, content_std = calc_mean_std(content_feat)
     normalized_feat = (content_feat - np.broadcast_to(content_mean, size)) / np.broadcast_to(content_std, size)
-    return normalized_feat * np.broadcast_to(style_std, size) + np.broadcast_to(style_mean, size)
+    result_feat = normalized_feat * np.broadcast_to(style_std, size) + np.broadcast_to(style_mean, size)
+
+    # Ensure values are within the range of source image bit depth
+    bit_range = 256 if np.max(content_feat) < 256 else 65536 # determine 8 bit or 16 bit.
+    a_min, a_max = np.min(result_feat, axis=(0,1)), np.max(result_feat, axis=(0,1)) # min/max of each color
+    i_min, i_max = np.argmin(a_min), np.argmax(a_max) # find the color index of global min and max
+    v_min, v_max = a_min[i_min], a_max[i_max]         # global min and max
+    if v_max > bit_range or v_min < 0:                # pixel value is out of the range of bit depth
+        # reduce the style_std to clamp values in range.
+        mean_min, mean_max = style_mean[0][0][i_min], style_mean[0][0][i_max] # mean of color for min/max
+        ratio = min(mean_min / (mean_min - v_min), (bit_range - 1e-12 - mean_max) / (v_max - mean_max))
+        style_std = style_std * np.broadcast_to([ratio, ratio, ratio], style_std.shape)
+        result_feat = normalized_feat * np.broadcast_to(style_std, size) + np.broadcast_to(style_mean, size)
+
+    return result_feat
