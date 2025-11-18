@@ -145,6 +145,65 @@ python inference_inpainting.py --input_path [image folder]|[image path]
 ### Training:
 The training commands can be found in the documents: [English](docs/train.md) **|** [简体中文](docs/train_CN.md).
 
+### License
+
+This project is licensed under <a rel="license" href="https://github.com/sczhou/CodeFormer/blob/master/LICENSE">NTU S-Lab License 1.0</a>. Redistribution and use should follow this license.
+
+---
+### 🐼 Ecosystem Applications & Deployments
+
+CodeFormer has been widely adopted and deployed across a broad range (>20) of online applications, platforms, API services, and independent websites, and has also been integrated into many open-source projects and toolkits.
+
+> Only demos on **Hugging Face Space**, **Replicate**, and **OpenXLab** are official deployments **maintained by the authors**. All other demos, APIs, apps, websites, and integrations listed below are **third-party (non-official)** and are not affiliated with the CodeFormer authors. Please verify their legitimacy to avoid potential financial loss.
+
+
+### Websites (Non-official)
+
+⚠️⚠️⚠️ The following websites are **not official and are not operated by us**. They use our models without any license or authorization. Please verify their legitimacy to avoid potential financial loss.
+
+
+| Website | Link | Notes |
+|---------|------|--------|
+| CodeFormer.net | https://codeformer.net/ | Non-official website |
+| CodeFormer.cn | https://www.codeformer.cn/ | Non-official website |
+| CodeFormerAI.com | https://codeformerai.com/ | Non-official website |
+
+### Online Demos / API Platforms
+
+| Platform | Link | Notes |
+|----------|------|--------|
+| Hugging Face | https://huggingface.co/spaces/sczhou/CodeFormer | Maintained by Authors |
+| Replicate | https://replicate.com/sczhou/codeformer | Maintained by Authors |
+| OpenXLab | https://openxlab.org.cn/apps/detail/ShangchenZhou/CodeFormer |Maintained by Authors |
+| Segmind | https://www.segmind.com/models/codeformer | Non-official |
+| Sieve | https://www.sievedata.com/functions/sieve/codeformer | Non-official |
+| Fal.ai | https://fal.ai/models/fal-ai/codeformer | Non-official |
+| VaikerAI | https://vaikerai.com/sczhou/codeformer | Non-official |
+| Scade.pro | https://www.scade.pro/processors/lucataco-codeformer | Non-official |
+| Grandline | https://www.grandline.ai/model/codeformer | Non-official |
+| AI Demos | https://aidemos.com/tools/codeformer | Non-official |
+| Synexa | https://synexa.ai/explore/sczhou/codeformer | Non-official |
+| RentPrompts | https://rentprompts.ai/models/Codeformer | Non-official |
+| ElevaticsAI | https://elevatics.ai/models/super-resolution/codeformer | Non-official |
+| Anakin.ai | https://anakin.ai/apps/codeformer-online-face-restoration-by-codeformer-19343 | Non-official |
+| Relayto | https://relayto.com/explore/codeformer-yf9rj8kwc7zsr | Non-official |
+
+
+### Open-Source Projects & Toolkits
+
+| Project / Toolkit | Link | Notes |
+|-------------------|------|--------|
+| Stable Diffusion GUI | https://nmkd.itch.io/t2i-gui | Integration |
+| Stable Diffusion WebUI | https://github.com/AUTOMATIC1111/stable-diffusion-webui | Integration |
+| ChaiNNer | https://github.com/chaiNNer-org/chaiNNer | Integration |
+| PyPI | https://pypi.org/project/codeformer/ ; https://pypi.org/project/codeformer-pip/ | Python packages |
+| ComfyUI | https://stable-diffusion-art.com/codeformer/ | Integration |
+
+---
+### Acknowledgement
+
+This project is based on [BasicSR](https://github.com/XPixelGroup/BasicSR). Some codes are brought from [Unleashing Transformers](https://github.com/samb-t/unleashing-transformers), [YOLOv5-face](https://github.com/deepcam-cn/yolov5-face), and [FaceXLib](https://github.com/xinntao/facexlib). We also adopt [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) to support background image enhancement. Thanks for their awesome works.
+
 ### Citation
 If our work is useful for your research, please consider citing:
 
@@ -155,13 +214,6 @@ If our work is useful for your research, please consider citing:
         year = {2022}
     }
 
-### License
-
-This project is licensed under <a rel="license" href="https://github.com/sczhou/CodeFormer/blob/master/LICENSE">NTU S-Lab License 1.0</a>. Redistribution and use should follow this license.
-
-### Acknowledgement
-
-This project is based on [BasicSR](https://github.com/XPixelGroup/BasicSR). Some codes are brought from [Unleashing Transformers](https://github.com/samb-t/unleashing-transformers), [YOLOv5-face](https://github.com/deepcam-cn/yolov5-face), and [FaceXLib](https://github.com/xinntao/facexlib). We also adopt [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) to support background image enhancement. Thanks for their awesome works.
 
 ### Contact
 If you have any questions, please feel free to reach me out at `shangchenzhou@gmail.com`. 
