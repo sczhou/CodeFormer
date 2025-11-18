@@ -157,7 +157,7 @@ CodeFormer has been widely adopted and deployed across a broad range (>20) of on
 > Only demos on **Hugging Face Space**, **Replicate**, and **OpenXLab** are official deployments **maintained by the authors**. All other demos, APIs, apps, websites, and integrations listed below are **third-party (non-official)** and are not affiliated with the CodeFormer authors. Please verify their legitimacy to avoid potential financial loss.
 
 
-### Websites (Non-official)
+#### Websites (Non-official)
 
 ⚠️⚠️⚠️ The following websites are **not official and are not operated by us**. They use our models without any license or authorization. Please verify their legitimacy to avoid potential financial loss.
 
@@ -168,7 +168,7 @@ CodeFormer has been widely adopted and deployed across a broad range (>20) of on
 | CodeFormer.cn | https://www.codeformer.cn/ | Non-official website |
 | CodeFormerAI.com | https://codeformerai.com/ | Non-official website |
 
-### Online Demos / API Platforms
+#### Online Demos / API Platforms
 
 | Platform | Link | Notes |
 |----------|------|--------|
@@ -189,7 +189,7 @@ CodeFormer has been widely adopted and deployed across a broad range (>20) of on
 | Relayto | https://relayto.com/explore/codeformer-yf9rj8kwc7zsr | Non-official |
 
 
-### Open-Source Projects & Toolkits
+#### Open-Source Projects & Toolkits
 
 | Project / Toolkit | Link | Notes |
 |-------------------|------|--------|
