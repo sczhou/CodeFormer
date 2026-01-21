@@ -259,6 +259,10 @@ if __name__ == '__main__':
         img_list = sorted(glob.glob(os.path.join(result_root, 'final_results', '*.[jp][pn]g')))
         for img_path in img_list:
             img = cv2.imread(img_path)
+            height, width = img.shape[:2]
+            wb = width % 2
+            hb = height % 2
+            img = cv2.copyMakeBorder(img, 0, hb, wb, 0, cv2.BORDER_REFLECT)
             video_frames.append(img)
         # write images to video
         height, width = video_frames[0].shape[:2]
