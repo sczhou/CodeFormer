@@ -187,6 +187,7 @@ CodeFormer has been widely adopted and deployed across a broad range (>20) of on
 | ElevaticsAI | https://elevatics.ai/models/super-resolution/codeformer | Non-official |
 | Anakin.ai | https://anakin.ai/apps/codeformer-online-face-restoration-by-codeformer-19343 | Non-official |
 | Relayto | https://relayto.com/explore/codeformer-yf9rj8kwc7zsr | Non-official |
+| ArtImageHub | https://artimagehub.com/old-photo-restoration | Non-official, old photo restoration web app |
 
 
 #### Open-Source Projects & Toolkits
