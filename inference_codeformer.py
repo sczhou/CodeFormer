@@ -161,6 +161,7 @@ if __name__ == '__main__':
         use_parse=True,
         device=device)
 
+    video_frames = []
     # -------------------- start to processing ---------------------
     for i, img_path in enumerate(input_img_list):
         # clean all the intermediate results to process the next image
@@ -250,16 +251,14 @@ if __name__ == '__main__':
                 basename = f'{basename}_{args.suffix}'
             save_restore_path = os.path.join(result_root, 'final_results', f'{basename}.png')
             imwrite(restored_img, save_restore_path)
+            if input_video:
+                video_frames.append(restored_img)
 
     # save enhanced video
     if input_video:
+        if not video_frames:
+            raise ValueError('No restored frames are available for video output.')
         print('Video Saving...')
-        # load images
-        video_frames = []
-        img_list = sorted(glob.glob(os.path.join(result_root, 'final_results', '*.[jp][pn]g')))
-        for img_path in img_list:
-            img = cv2.imread(img_path)
-            video_frames.append(img)
         # write images to video
         height, width = video_frames[0].shape[:2]
         if args.suffix is not None:
